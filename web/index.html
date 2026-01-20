@@ -19,7 +19,6 @@
 
         html, body {
             height: 100%;
-            overflow: hidden;
         }
 
         body {
@@ -212,6 +211,15 @@
             font-size: 13px;
             color: var(--muted);
         }
+
+        /* Desktop: no scroll, app-like */
+        @media (min-width: 900px) {
+            html, body {
+                overflow: hidden;
+            }
+        }
+
+
     </style>
 </head>
 
