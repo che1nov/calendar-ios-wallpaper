@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Calendar Wallpaper</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        :root {
+            --bg: #0b0b0b;
+            --card: #141414;
+            --muted: #8e8e93;
+            --text: #ffffff;
+            --accent: #ff9f0a;
+            --border: #2a2a2a;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(1200px 600px at top, #111 0%, var(--bg) 60%);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 32px 20px;
+            height: 100%;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0 0 8px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 32px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        /* =========================
+           iPhone Preview
+           ========================= */
+
+        .phone-frame {
+            width: 360px;
+            height: 740px;
+            border-radius: 46px;
+            background: #000;
+            position: relative;
+            box-shadow:
+                    0 30px 80px rgba(0,0,0,.8),
+                    inset 0 0 0 2px rgba(255,255,255,.06);
+            padding: 14px;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 36px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 34px;
+            background: #000;
+            border-radius: 18px;
+            z-index: 20;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+        }
+
+        /* Preview viewport */
+
+        .preview-viewport {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center;
+            transition: transform .25s ease;
+        }
+
+        .preview-viewport.fit      { transform: scale(0.25); }
+        .preview-viewport.readable { transform: scale(0.29); }
+        .preview-viewport.full     { transform: scale(1); }
+
+        .preview-viewport img {
+            width: 1179px;
+            height: 2556px;
+            image-rendering: crisp-edges;
+            transition: filter .3s ease, opacity .3s ease;
+        }
+
+        /* =========================
+           AOD MODE
+           ========================= */
+
+        .phone-screen.aod img {
+            filter: brightness(0.45) contrast(0.9) blur(0.3px);
+            opacity: 0.85;
+        }
+
+        .phone-screen.aod::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                    ellipse at center,
+                    rgba(255,255,255,0.03),
+                    rgba(0,0,0,0.35)
+            );
+            pointer-events: none;
+        }
+
+        /* =========================
+           Controls
+           ========================= */
+
+        .controls {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .control {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            background: #1c1c1e;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 15px;
+        }
+
+        select:focus,
+        input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        /* URL */
+
+        .url-box {
+            margin-top: 24px;
+            background: #0f0f0f;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 13px;
+            word-break: break-all;
+            color: #d1d1d6;
+        }
+
+        .copy {
+            margin-top: 12px;
+            background: var(--accent);
+            color: #000;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .copy:active { transform: scale(0.98); }
+
+        .hint {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>Calendar Wallpaper</h1>
+    <div class="subtitle">Minimal calendar wallpaper that updates automatically.</div>
+
+    <div class="layout">
+
+        <!-- iPhone -->
+        <div class="phone-frame">
+            <div id="screen" class="phone-screen">
+                <div class="dynamic-island"></div>
+                <div id="viewport" class="preview-viewport readable">
+                    <img id="preview" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div>
+            <div class="controls">
+
+                <div class="control">
+                    <label>Language</label>
+                    <select id="lang">
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Timezone (UTC offset)</label>
+                    <input id="tz" type="number" value="3" />
+                </div>
+
+                <div class="control">
+                    <label>Preview size</label>
+                    <select id="previewSize">
+                        <option value="fit">Fit</option>
+                        <option value="readable" selected>Readable</option>
+                        <option value="full">1:1</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Always-On Display</label>
+                    <select id="aod">
+                        <option value="off">Off</option>
+                        <option value="on">On</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="url-box" id="url"></div>
+            <button class="copy" id="copy">Copy link</button>
+
+            <div class="hint">
+                AOD preview simulates iOS Always-On Display.
+                Wallpaper image itself is unchanged.
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const preview = document.getElementById("preview");
+    const urlBox = document.getElementById("url");
+    const lang = document.getElementById("lang");
+    const tz = document.getElementById("tz");
+    const viewport = document.getElementById("viewport");
+    const previewSize = document.getElementById("previewSize");
+    const screen = document.getElementById("screen");
+    const aod = document.getElementById("aod");
+    const copy = document.getElementById("copy");
+
+    function buildURL() {
+        return `/wallpaper?mode=months&theme=ios&lang=${lang.value}&timezone=${tz.value}`;
+    }
+
+    function update() {
+        const u = buildURL();
+        preview.src = u;
+        urlBox.textContent = location.origin + u;
+    }
+
+    previewSize.onchange = () =>
+        viewport.className = `preview-viewport ${previewSize.value}`;
+
+    aod.onchange = () =>
+        screen.classList.toggle("aod", aod.value === "on");
+
+    copy.onclick = () => {
+        navigator.clipboard.writeText(urlBox.textContent);
+        copy.textContent = "Copied ✓";
+        setTimeout(() => copy.textContent = "Copy link", 1200);
+    };
+
+    lang.onchange = update;
+    tz.oninput = update;
+
+    update();
+</script>
+
+</body>
+</html>
