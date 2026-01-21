@@ -16,6 +16,10 @@ import (
 const (
 	Width  = 1179
 	Height = 2556
+
+	// iPhone 15 lock screen safe areas
+	TopSafe    = 380
+	BottomSafe = 200
 )
 
 var (
@@ -45,7 +49,7 @@ func init() {
 	})
 }
 
-// ЕДИНСТВЕННАЯ функция рендера — с lang
+// Главная функция рендера
 func RenderCalendarWithLang(now time.Time, theme Theme, mode string, lang string) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
@@ -67,18 +71,17 @@ func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
 	cols := 3
 	rows := 4
 
-	topOffset := 340
-	bottomOffset := 300
+	usableHeight := Height - TopSafe - BottomSafe
 
 	cellW := Width / cols
-	cellH := (Height - topOffset - bottomOffset) / rows
+	cellH := usableHeight / rows
 
 	for i, m := range months {
 		c := i % cols
 		r := i / cols
 
 		cx := c*cellW + cellW/2
-		cy := topOffset + r*cellH + cellH/2
+		cy := TopSafe + r*cellH + cellH/2
 
 		drawMonth(img, cx, cy, m, theme)
 	}
@@ -89,13 +92,16 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 	if m.IsCurrent {
 		titleColor = theme.Today
 	}
-	drawText(img, m.Name, cx, cy-100, titleColor, monthFace)
+
+	// Заголовок месяца
+	drawText(img, m.Name, cx, cy-110, titleColor, monthFace)
 
 	cols := 7
 	spacing := 36
 	radius := 10
 
-	startX := cx - (cols*spacing)/2
+	// ВАЖНО: правильное центрирование сетки
+	startX := cx - (cols-1)*spacing/2
 	startY := cy - 10
 
 	for i := 0; i < m.Days; i++ {
@@ -116,7 +122,9 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 
 func drawFooter(img *image.RGBA, left, passed int, theme Theme) {
 	text := fmt.Sprintf("%d d left   %d%%", left, passed)
-	drawText(img, text, Width/2, Height-170, theme.Text, footerFace)
+
+	y := Height - BottomSafe + 80
+	drawText(img, text, Width/2, y, theme.Text, footerFace)
 }
 
 func drawText(img *image.RGBA, text string, cx int, y int, col color.Color, face font.Face) {
