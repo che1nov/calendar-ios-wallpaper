@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"image/png"
 	"net/http"
 	"strconv"
@@ -48,5 +49,6 @@ func main() {
 		_ = png.Encode(w, img)
 	})
 
+	fmt.Println("Listening on port 8080")
 	http.ListenAndServe(":8080", nil)
 }

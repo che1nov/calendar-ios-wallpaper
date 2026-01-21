@@ -60,16 +60,21 @@ func drawMonths(
 ) {
 	const cols, rows = 3, 4
 
-	usable := device.Height - device.TopSafe - device.BottomSafe
+	// контент строго между safe-зонами
+	contentTop := device.TopSafe
+	contentBottom := device.Height - device.BottomSafe - device.FooterOffset - int(device.FooterFont) - 20
+
+	usableHeight := contentBottom - contentTop
+
 	cellW := device.Width / cols
-	cellH := usable / rows
+	cellH := usableHeight / rows
 
 	for i, m := range months {
 		c := i % cols
 		r := i / cols
 
 		cx := c*cellW + cellW/2
-		cy := device.TopSafe + r*cellH + cellH/2
+		cy := contentTop + r*cellH + cellH/2
 
 		drawMonth(img, cx, cy, m, device, theme, weekends)
 	}
@@ -134,7 +139,11 @@ func drawFooter(
 	footerFace := makeFont(device.FooterFont)
 
 	text := footerText(left, percent, lang)
-	y := device.Height - device.BottomSafe + 50
+
+	y := device.Height -
+		device.BottomSafe -
+		device.FooterOffset
+
 	drawText(img, text, device.Width/2, y, theme.Text, footerFace)
 }
 
