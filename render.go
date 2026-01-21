@@ -1,111 +1,86 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"os"
 	"time"
 
 	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
 )
 
-func RenderCalendar(
-	now time.Time,
-	device DeviceProfile,
-	theme Theme,
-	mode, lang, weekends string,
-) *image.RGBA {
+const (
+	Width  = 1179
+	Height = 2556
+)
 
-	img := image.NewRGBA(image.Rect(0, 0, device.Width, device.Height))
+var monthFace, footerFace font.Face
+
+func init() {
+	data, _ := os.ReadFile("fonts/Inter-Regular.ttf")
+	f, _ := opentype.Parse(data)
+
+	monthFace, _ = opentype.NewFace(f, &opentype.FaceOptions{Size: 40, DPI: 72})
+	footerFace, _ = opentype.NewFace(f, &opentype.FaceOptions{Size: 34, DPI: 72})
+}
+
+func RenderCalendar(now time.Time, theme Theme, mode, lang string) *image.RGBA {
+	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
 
-	if mode == "months" {
-		months := BuildMonths(now, lang)
-		drawMonths(img, months, device, theme, weekends)
-		drawFooter(img, device, theme)
-	}
+	_, left, percent := Progress(now)
 
+	months := BuildMonths(now, lang)
+	drawMonths(img, months, theme)
+
+	drawText(img, fmt.Sprintf("%d d left   %d%%", left, percent), Width/2, Height-180, theme.Text, footerFace)
 	return img
 }
 
-func drawMonths(
-	img *image.RGBA,
-	months []MonthData,
-	device DeviceProfile,
-	theme Theme,
-	weekends string,
-) {
-	const cols, rows = 3, 4
-
-	usableTop := device.ClockInset
-	usableHeight := device.Height - device.ClockInset - device.BottomInset
-
-	cellW := device.Width / cols
-	cellH := usableHeight / rows
+func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
+	cellW := Width / 3
+	cellH := (Height - 500) / 4
+	offsetY := 320
 
 	for i, m := range months {
-		c := i % cols
-		r := i / cols
-
+		c := i % 3
+		r := i / 3
 		cx := c*cellW + cellW/2
-		cy := usableTop + r*cellH + cellH/2
-
-		drawMonth(img, cx, cy, m, device, theme, weekends)
+		cy := offsetY + r*cellH + cellH/2
+		drawMonth(img, cx, cy, m, theme)
 	}
 }
 
-func drawMonth(
-	img *image.RGBA,
-	cx, cy int,
-	m MonthData,
-	device DeviceProfile,
-	theme Theme,
-	weekends string,
-) {
-	titleColor := theme.Text
-	if m.IsCurrent {
-		titleColor = theme.Today
-	}
-
-	drawText(img, m.Name, cx, cy-70, titleColor, monthFace)
+func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
+	drawText(img, m.Name, cx, cy-80, theme.Text, monthFace)
 
 	spacing := 32
 	radius := 9
-	startX := cx - (6 * spacing / 2)
-	startY := cy
+	startX := cx - 3*spacing
+	startY := cy - 10
 
 	for d := 0; d < m.Days; d++ {
 		i := m.StartWeekday + d
-		col := i % 7
-		row := i / 7
+		x := startX + (i%7)*spacing
+		y := startY + (i/7)*spacing
 
-		x := startX + col*spacing
-		y := startY + row*spacing
-
-		colr := theme.Future
+		col := theme.Future
 		if d < m.PassedDays {
-			colr = theme.Active
+			col = theme.Active
 		}
-
 		if m.IsCurrent && d == m.PassedDays-1 {
-			colr = theme.Today
+			col = theme.Today
 		}
-
-		drawCircle(img, x, y, radius, colr)
+		drawCircle(img, x, y, radius, col)
 	}
-}
-
-func drawFooter(img *image.RGBA, device DeviceProfile, theme Theme) {
-	drawText(img, "Year progress", device.Width/2, device.Height-device.BottomInset/2, theme.Text, footerFace)
 }
 
 func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
-	d := &font.Drawer{
-		Dst:  img,
-		Src:  image.NewUniform(col),
-		Face: face,
-	}
+	d := &font.Drawer{Dst: img, Src: image.NewUniform(col), Face: face}
 	w := d.MeasureString(text).Round()
 	d.Dot = fixed.P(cx-w/2, y)
 	d.DrawString(text)

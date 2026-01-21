@@ -1,15 +1,36 @@
 package main
 
 import (
+	"image/png"
+	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func main() {
-	RegisterHandlers()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "web/index.html")
+	})
 
-	http.Handle("/web/",
-		http.StripPrefix("/web/",
-			http.FileServer(http.Dir("web"))))
+	http.HandleFunc("/wallpaper", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
 
-	http.ListenAndServe(":8080", nil)
+		lang := q.Get("lang")
+		if lang == "" {
+			lang = "en"
+		}
+
+		tz, _ := strconv.Atoi(q.Get("timezone"))
+		loc := time.FixedZone("user", tz*3600)
+		now := time.Now().In(loc)
+
+		img := RenderCalendar(now, IOSTheme(), "months", lang)
+
+		w.Header().Set("Content-Type", "image/png")
+		_ = png.Encode(w, img)
+	})
+
+	log.Println("Listening on :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
