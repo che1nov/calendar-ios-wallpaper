@@ -28,23 +28,26 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		mode = "months"
 	}
 
-	themeName := q.Get("theme")
-	if themeName == "" {
-		themeName = "ios"
-	}
-
 	lang := q.Get("lang")
 	if lang == "" {
 		lang = "en"
 	}
 
-	tz, _ := strconv.Atoi(q.Get("timezone"))
-	loc := time.FixedZone("user", tz*3600)
+	tzOffset, _ := strconv.Atoi(q.Get("timezone"))
+	loc := time.FixedZone("user", tzOffset*3600)
 	now := time.Now().In(loc)
 
-	theme := Themes[themeName]
+	showWeekends := q.Get("weekends") != "off"
 
-	img := RenderCalendarWithLang(now, theme, mode, lang)
+	theme := IOSTheme()
+
+	img := RenderCalendar(
+		now,
+		theme,
+		mode,
+		lang,
+		showWeekends,
+	)
 
 	w.Header().Set("Content-Type", "image/png")
 	_ = png.Encode(w, img)

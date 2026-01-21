@@ -29,10 +29,7 @@ func init() {
 		panic("fonts/Inter-Regular.ttf not found")
 	}
 
-	f, err := opentype.Parse(fontBytes)
-	if err != nil {
-		panic(err)
-	}
+	f, _ := opentype.Parse(fontBytes)
 
 	monthFace, _ = opentype.NewFace(f, &opentype.FaceOptions{
 		Size: 40,
@@ -45,9 +42,13 @@ func init() {
 	})
 }
 
-// ===== MAIN RENDER =====
+func RenderCalendar(
+	now time.Time,
+	theme Theme,
+	mode, lang string,
+	showWeekends bool,
+) *image.RGBA {
 
-func RenderCalendarWithLang(now time.Time, theme Theme, mode, lang string) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
 
@@ -55,20 +56,16 @@ func RenderCalendarWithLang(now time.Time, theme Theme, mode, lang string) *imag
 
 	if mode == "months" {
 		months := BuildMonths(now, lang)
-		drawMonths(img, months, theme)
+		drawMonths(img, months, theme, showWeekends)
 
-		passed := 100 - percent
-		drawFooter(img, left, passed, theme, lang)
+		drawFooter(img, left, 100-percent, theme, lang)
 	}
 
 	return img
 }
 
-// ===== MONTH GRID =====
-
-func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
-	cols := 3
-	rows := 4
+func drawMonths(img *image.RGBA, months []MonthData, theme Theme, showWeekends bool) {
+	const cols, rows = 3, 4
 
 	topSafe, bottomSafe := calcSafeAreas(Height)
 	usableHeight := Height - topSafe - bottomSafe
@@ -83,11 +80,11 @@ func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
 		cx := c*cellW + cellW/2
 		cy := topSafe + r*cellH + cellH/2
 
-		drawMonth(img, cx, cy, m, theme)
+		drawMonth(img, cx, cy, m, theme, showWeekends)
 	}
 }
 
-func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
+func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme, showWeekends bool) {
 	titleColor := theme.Text
 	if m.IsCurrent {
 		titleColor = theme.Today
@@ -95,36 +92,41 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 
 	drawText(img, m.Name, cx, cy-80, titleColor, monthFace)
 
-	cols := 7
-	spacing := 32
-	radius := 9
+	const spacing, radius = 32, 9
 
-	startX := cx - (cols-1)*spacing/2
+	startX := cx - (7-1)*spacing/2
 	startY := cy - 10
 
 	for day := 0; day < m.Days; day++ {
-		visualIndex := m.StartWeekday + day
-		col := visualIndex % 7
-		row := visualIndex / 7
+		index := m.StartWeekday + day
+		col := index % 7
+		row := index / 7
 
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		colorDot := theme.Future
+		isWeekend := col == 5 || col == 6
+
+		dot := theme.Future
+
+		if showWeekends && isWeekend {
+			dot = theme.Weekend
+		}
 
 		if day < m.PassedDays {
-			colorDot = theme.Active
+			dot = theme.Active
+			if showWeekends && isWeekend {
+				dot = theme.Weekend
+			}
 		}
 
 		if m.IsCurrent && day == m.PassedDays-1 {
-			colorDot = theme.Today
+			dot = theme.Today
 		}
 
-		drawCircle(img, x, y, radius, colorDot)
+		drawCircle(img, x, y, radius, dot)
 	}
 }
-
-// ===== FOOTER =====
 
 func drawFooter(img *image.RGBA, left, passed int, theme Theme, lang string) {
 	text := footerText(left, passed, lang)
@@ -132,22 +134,16 @@ func drawFooter(img *image.RGBA, left, passed int, theme Theme, lang string) {
 }
 
 func footerText(left, passed int, lang string) string {
-	switch lang {
-	case "ru":
+	if lang == "ru" {
 		return fmt.Sprintf("%d дн. осталось   %d%%", left, passed)
-	case "en":
-		return fmt.Sprintf("%d d left   %d%%", left, passed)
-	default:
-		return fmt.Sprintf("%d d left   %d%%", left, passed)
 	}
+	return fmt.Sprintf("%d d left   %d%%", left, passed)
 }
 
 func footerY() int {
 	_, bottomSafe := calcSafeAreas(Height)
 	return Height - bottomSafe + 60
 }
-
-// ===== TEXT & SHAPES =====
 
 func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
 	d := &font.Drawer{
@@ -171,10 +167,8 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 	}
 }
 
-// ===== SAFE AREAS =====
-
 func calcSafeAreas(height int) (top, bottom int) {
-	top = int(float64(height) * 0.22)    // зона часов / island
-	bottom = int(float64(height) * 0.16) // зона кнопок
+	top = int(float64(height) * 0.22)
+	bottom = int(float64(height) * 0.16)
 	return
 }

@@ -58,9 +58,7 @@
             .layout { grid-template-columns: 1fr; }
         }
 
-        /* =========================
-           iPhone Preview
-           ========================= */
+        /* ===== iPhone Preview ===== */
 
         .phone-frame {
             width: 360px;
@@ -96,8 +94,6 @@
             box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
         }
 
-        /* Preview viewport */
-
         .preview-viewport {
             width: 100%;
             height: 100%;
@@ -116,33 +112,16 @@
             width: 1179px;
             height: 2556px;
             image-rendering: crisp-edges;
-            transition: filter .3s ease, opacity .3s ease;
         }
 
-        /* =========================
-           AOD MODE
-           ========================= */
+        /* ===== AOD ===== */
 
         .phone-screen.aod img {
             filter: brightness(0.45) contrast(0.9) blur(0.3px);
             opacity: 0.85;
         }
 
-        .phone-screen.aod::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(
-                    ellipse at center,
-                    rgba(255,255,255,0.03),
-                    rgba(0,0,0,0.35)
-            );
-            pointer-events: none;
-        }
-
-        /* =========================
-           Controls
-           ========================= */
+        /* ===== Controls ===== */
 
         .controls {
             background: var(--card);
@@ -179,8 +158,6 @@
             outline: none;
         }
 
-        /* URL */
-
         .url-box {
             margin-top: 24px;
             background: #0f0f0f;
@@ -204,28 +181,17 @@
             border: none;
         }
 
-        .copy:active { transform: scale(0.98); }
-
-        .hint {
-            margin-top: 16px;
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        /* Desktop: no scroll, app-like */
+        /* Desktop scroll */
         @media (min-width: 900px) {
             html, body {
                 overflow: hidden;
             }
 
             .container {
-                height: 100vh;
+                max-height: 100vh;
                 overflow-y: auto;
             }
         }
-
-
-
     </style>
 </head>
 
@@ -237,7 +203,6 @@
 
     <div class="layout">
 
-        <!-- iPhone -->
         <div class="phone-frame">
             <div id="screen" class="phone-screen">
                 <div class="dynamic-island"></div>
@@ -247,7 +212,6 @@
             </div>
         </div>
 
-        <!-- Controls -->
         <div>
             <div class="controls">
 
@@ -281,15 +245,18 @@
                     </select>
                 </div>
 
+                <div class="control">
+                    <label>Highlight weekends</label>
+                    <select id="weekends">
+                        <option value="on" selected>On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+
             </div>
 
             <div class="url-box" id="url"></div>
             <button class="copy" id="copy">Copy link</button>
-
-            <div class="hint">
-                AOD preview simulates iOS Always-On Display.
-                Wallpaper image itself is unchanged.
-            </div>
         </div>
 
     </div>
@@ -304,10 +271,15 @@
     const previewSize = document.getElementById("previewSize");
     const screen = document.getElementById("screen");
     const aod = document.getElementById("aod");
+    const weekends = document.getElementById("weekends");
     const copy = document.getElementById("copy");
 
     function buildURL() {
-        return `/wallpaper?mode=months&theme=ios&lang=${lang.value}&timezone=${tz.value}`;
+        return `/wallpaper?mode=months`
+            + `&theme=ios`
+            + `&lang=${lang.value}`
+            + `&timezone=${tz.value}`
+            + `&weekends=${weekends.value}`;
     }
 
     function update() {
@@ -322,14 +294,15 @@
     aod.onchange = () =>
         screen.classList.toggle("aod", aod.value === "on");
 
+    lang.onchange = update;
+    tz.oninput = update;
+    weekends.onchange = update;
+
     copy.onclick = () => {
         navigator.clipboard.writeText(urlBox.textContent);
         copy.textContent = "Copied ✓";
         setTimeout(() => copy.textContent = "Copy link", 1200);
     };
-
-    lang.onchange = update;
-    tz.oninput = update;
 
     update();
 </script>
