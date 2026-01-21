@@ -93,28 +93,34 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 		titleColor = theme.Today
 	}
 
-	drawText(img, m.Name, cx, cy-70, titleColor, monthFace)
+	drawText(img, m.Name, cx, cy-80, titleColor, monthFace)
 
 	cols := 7
-	spacing := 30
+	spacing := 32
 	radius := 9
 
 	startX := cx - (cols-1)*spacing/2
-	startY := cy - 5
+	startY := cy - 10
 
-	for i := 0; i < m.Days; i++ {
-		x := startX + (i%cols)*spacing
-		y := startY + (i/cols)*spacing
+	for day := 0; day < m.Days; day++ {
+		visualIndex := m.StartWeekday + day
+		col := visualIndex % 7
+		row := visualIndex / 7
 
-		col := theme.Future
-		if i < m.PassedDays {
-			col = theme.Active
+		x := startX + col*spacing
+		y := startY + row*spacing
+
+		colorDot := theme.Future
+
+		if day < m.PassedDays {
+			colorDot = theme.Active
 		}
-		if m.IsCurrent && m.PassedDays > 0 && i == m.PassedDays-1 {
-			col = theme.Today
+
+		if m.IsCurrent && day == m.PassedDays-1 {
+			colorDot = theme.Today
 		}
 
-		drawCircle(img, x, y, radius, col)
+		drawCircle(img, x, y, radius, colorDot)
 	}
 }
 
