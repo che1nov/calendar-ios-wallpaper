@@ -46,7 +46,7 @@ func RenderCalendar(
 	now time.Time,
 	theme Theme,
 	mode, lang string,
-	showWeekends bool,
+	weekendMode string,
 ) *image.RGBA {
 
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
@@ -56,7 +56,7 @@ func RenderCalendar(
 
 	if mode == "months" {
 		months := BuildMonths(now, lang)
-		drawMonths(img, months, theme, showWeekends)
+		drawMonths(img, months, theme, weekendMode)
 
 		drawFooter(img, left, 100-percent, theme, lang)
 	}
@@ -64,7 +64,7 @@ func RenderCalendar(
 	return img
 }
 
-func drawMonths(img *image.RGBA, months []MonthData, theme Theme, showWeekends bool) {
+func drawMonths(img *image.RGBA, months []MonthData, theme Theme, weekendMode string) {
 	const cols, rows = 3, 4
 
 	topSafe, bottomSafe := calcSafeAreas(Height)
@@ -80,7 +80,7 @@ func drawMonths(img *image.RGBA, months []MonthData, theme Theme, showWeekends b
 		cx := c*cellW + cellW/2
 		cy := topSafe + r*cellH + cellH/2
 
-		drawMonth(img, cx, cy, m, theme, showWeekends)
+		drawMonth(img, cx, cy, m, theme, weekendMode)
 	}
 }
 
@@ -89,7 +89,7 @@ func drawMonth(
 	cx, cy int,
 	m MonthData,
 	theme Theme,
-	showWeekends bool,
+	weekendMode string,
 ) {
 	titleColor := theme.Text
 	if m.IsCurrent {
@@ -120,12 +120,19 @@ func drawMonth(
 			dotColor = theme.Active
 		}
 
-		// выходные (СБ=5, ВС=6)
-		if showWeekends && (col == 5 || col == 6) {
-			dotColor = theme.Weekend
+		// выходные
+		if col == 5 || col == 6 {
+			switch weekendMode {
+			case "green":
+				dotColor = theme.WeekendGreen
+			case "blue":
+				dotColor = theme.WeekendBlue
+			case "red":
+				dotColor = theme.WeekendRed
+			}
 		}
 
-		// сегодня — ВСЕГДА приоритет
+		// сегодня — всегда приоритет
 		if m.IsCurrent && day == m.PassedDays-1 {
 			dotColor = theme.Today
 		}
