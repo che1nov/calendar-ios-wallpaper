@@ -150,7 +150,7 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 }
 
 func calcSafeAreas(height int) (top, bottom int) {
-	top = int(float64(height) * 0.20)    // ~18% под часы
+	top = int(float64(height) * 0.25)    // ~18% под часы
 	bottom = int(float64(height) * 0.20) // ~14% под кнопки
 	return
 }
