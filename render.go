@@ -69,18 +69,20 @@ func RenderCalendarWithLang(now time.Time, theme Theme, mode string, lang string
 
 func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
 	cols := 3
+	rows := 4
 
-	startY := TopSafe + 320 // где начинается первый ряд
-	rowGap := 220           // расстояние между рядами месяцев
+	topSafe, bottomSafe := calcSafeAreas(Height)
+	usableHeight := Height - topSafe - bottomSafe
 
 	cellW := Width / cols
+	cellH := usableHeight / rows
 
 	for i, m := range months {
 		c := i % cols
 		r := i / cols
 
 		cx := c*cellW + cellW/2
-		cy := startY + r*rowGap
+		cy := topSafe + r*cellH + cellH/2
 
 		drawMonth(img, cx, cy, m, theme)
 	}
@@ -145,4 +147,10 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 			}
 		}
 	}
+}
+
+func calcSafeAreas(height int) (top, bottom int) {
+	top = int(float64(height) * 0.18)    // ~18% под часы
+	bottom = int(float64(height) * 0.14) // ~14% под кнопки
+	return
 }
