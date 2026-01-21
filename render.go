@@ -167,9 +167,9 @@ func drawFooter(
 
 func footerText(left, passed int, lang string) string {
 	if lang == "ru" {
-		return fmt.Sprintf("%d дн. осталось   %d%%", left, passed)
+		return fmt.Sprintf("%dдн. осталось   %d%%", left, passed)
 	}
-	return fmt.Sprintf("%d d left   %d%%", left, passed)
+	return fmt.Sprintf("%dd left   %d%%", left, passed)
 }
 
 func footerY(device DeviceProfile) int {
