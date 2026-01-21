@@ -3,25 +3,16 @@ package main
 import "time"
 
 type MonthData struct {
-	Name       string
-	Days       int
-	PassedDays int
-	IsCurrent  bool
+	Name         string
+	Days         int
+	PassedDays   int
+	StartWeekday int // Monday = 0
+	IsCurrent    bool
 }
 
 var monthNames = map[string][]string{
-	"en": {
-		"Jan", "Feb", "Mar",
-		"Apr", "May", "Jun",
-		"Jul", "Aug", "Sep",
-		"Oct", "Nov", "Dec",
-	},
-	"ru": {
-		"Янв", "Фев", "Мар",
-		"Апр", "Май", "Июн",
-		"Июл", "Авг", "Сен",
-		"Окт", "Ноя", "Дек",
-	},
+	"en": {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
+	"ru": {"Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"},
 }
 
 func DaysInYear(year int) int {
@@ -54,23 +45,25 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 		first := time.Date(year, time.Month(m), 1, 0, 0, 0, 0, loc)
 		daysInMonth := first.AddDate(0, 1, -1).Day()
 
-		// ISO week: Monday = 0, Sunday = 6
+		// Go: Sunday=0 … Saturday=6
+		// Convert to Monday=0 … Sunday=6
 		startWeekday := (int(first.Weekday()) + 6) % 7
 
-		isCurrent := int(now.Month()) == m
+		isCurrent := now.Year() == year && int(now.Month()) == m
 
 		passed := 0
 		if isCurrent {
-			passed = startWeekday + now.Day()
+			passed = now.Day()
 		} else if int(now.Month()) > m {
-			passed = startWeekday + daysInMonth
+			passed = daysInMonth
 		}
 
 		months[m-1] = MonthData{
-			Name:       names[m-1],
-			Days:       startWeekday + daysInMonth,
-			PassedDays: passed,
-			IsCurrent:  isCurrent,
+			Name:         names[m-1],
+			Days:         daysInMonth,
+			PassedDays:   passed,
+			StartWeekday: startWeekday,
+			IsCurrent:    isCurrent,
 		}
 	}
 
