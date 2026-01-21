@@ -52,20 +52,25 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 
 	for m := 1; m <= 12; m++ {
 		first := time.Date(year, time.Month(m), 1, 0, 0, 0, 0, loc)
-		days := first.AddDate(0, 1, -1).Day()
+		daysInMonth := first.AddDate(0, 1, -1).Day()
+
+		// ISO week: Monday = 0, Sunday = 6
+		startWeekday := (int(first.Weekday()) + 6) % 7
+
+		isCurrent := int(now.Month()) == m
 
 		passed := 0
-		if int(now.Month()) > m {
-			passed = days
-		} else if int(now.Month()) == m {
-			passed = now.Day()
+		if isCurrent {
+			passed = startWeekday + now.Day() - 1
+		} else if int(now.Month()) > m {
+			passed = startWeekday + daysInMonth
 		}
 
 		months[m-1] = MonthData{
 			Name:       names[m-1],
-			Days:       days,
+			Days:       startWeekday + daysInMonth,
 			PassedDays: passed,
-			IsCurrent:  int(now.Month()) == m,
+			IsCurrent:  isCurrent,
 		}
 	}
 
