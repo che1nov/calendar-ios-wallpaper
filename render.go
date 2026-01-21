@@ -44,33 +44,42 @@ func init() {
 
 func RenderCalendar(
 	now time.Time,
+	device DeviceProfile,
 	theme Theme,
 	mode, lang string,
 	weekends string,
 ) *image.RGBA {
 
-	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
+	img := image.NewRGBA(image.Rect(0, 0, device.Width, device.Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
 
 	_, left, percent := Progress(now)
 
 	if mode == "months" {
 		months := BuildMonths(now, lang)
-		drawMonths(img, months, theme, weekends)
+		drawMonths(img, months, device, theme, weekends)
 
-		drawFooter(img, left, 100-percent, theme, lang)
+		passed := percent
+		drawFooter(img, left, passed, device, theme, lang)
+
 	}
 
 	return img
 }
 
-func drawMonths(img *image.RGBA, months []MonthData, theme Theme, weekendMode string) {
+func drawMonths(
+	img *image.RGBA,
+	months []MonthData,
+	device DeviceProfile,
+	theme Theme,
+	weekends string,
+) {
 	const cols, rows = 3, 4
 
-	topSafe, bottomSafe := calcSafeAreas(Height)
-	usableHeight := Height - topSafe - bottomSafe
+	topSafe, bottomSafe := calcSafeAreas(device.Height)
+	usableHeight := device.Height - topSafe - bottomSafe
 
-	cellW := Width / cols
+	cellW := device.Width / cols
 	cellH := usableHeight / rows
 
 	for i, m := range months {
@@ -80,7 +89,7 @@ func drawMonths(img *image.RGBA, months []MonthData, theme Theme, weekendMode st
 		cx := c*cellW + cellW/2
 		cy := topSafe + r*cellH + cellH/2
 
-		drawMonth(img, cx, cy, m, theme, weekendMode)
+		drawMonth(img, cx, cy, m, theme, weekends)
 	}
 }
 
@@ -145,9 +154,15 @@ func drawMonth(
 	}
 }
 
-func drawFooter(img *image.RGBA, left, passed int, theme Theme, lang string) {
+func drawFooter(
+	img *image.RGBA,
+	left, passed int,
+	device DeviceProfile,
+	theme Theme,
+	lang string,
+) {
 	text := footerText(left, passed, lang)
-	drawText(img, text, Width/2, footerY(), theme.Text, footerFace)
+	drawText(img, text, device.Width/2, footerY(device), theme.Text, footerFace)
 }
 
 func footerText(left, passed int, lang string) string {
@@ -157,9 +172,9 @@ func footerText(left, passed int, lang string) string {
 	return fmt.Sprintf("%d d left   %d%%", left, passed)
 }
 
-func footerY() int {
-	_, bottomSafe := calcSafeAreas(Height)
-	return Height - bottomSafe + 60
+func footerY(device DeviceProfile) int {
+	_, bottom := calcSafeAreas(device.Height)
+	return device.Height - bottom + int(float64(device.Height)*0.02)
 }
 
 func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
@@ -185,7 +200,7 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 }
 
 func calcSafeAreas(height int) (top, bottom int) {
-	top = int(float64(height) * 0.22)
-	bottom = int(float64(height) * 0.16)
+	top = int(float64(height) * 0.25)    // Dynamic Island / часы
+	bottom = int(float64(height) * 0.25) // кнопки камеры/фонаря
 	return
 }

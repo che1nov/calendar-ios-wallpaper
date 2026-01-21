@@ -23,9 +23,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
-	mode := q.Get("mode")
-	if mode == "" {
-		mode = "months"
+	deviceKey := q.Get("device")
+	if deviceKey == "" {
+		deviceKey = "iphone-15"
+	}
+
+	device, ok := Devices[deviceKey]
+	if !ok {
+		device = Devices["iphone-15"]
 	}
 
 	lang := q.Get("lang")
@@ -33,21 +38,20 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		lang = "en"
 	}
 
-	tzOffset, _ := strconv.Atoi(q.Get("timezone"))
-	loc := time.FixedZone("user", tzOffset*3600)
-	now := time.Now().In(loc)
-
 	weekends := q.Get("weekends")
 	if weekends == "" {
 		weekends = "off"
 	}
 
-	theme := IOSTheme()
+	tzOffset, _ := strconv.Atoi(q.Get("timezone"))
+	loc := time.FixedZone("user", tzOffset*3600)
+	now := time.Now().In(loc)
 
 	img := RenderCalendar(
 		now,
-		theme,
-		mode,
+		device,
+		IOSTheme(),
+		"months",
 		lang,
 		weekends,
 	)

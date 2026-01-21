@@ -23,9 +23,9 @@ func IOSTheme() Theme {
 		Text:       color.RGBA{200, 200, 200, 255},
 		Today:      color.RGBA{255, 140, 0, 255},
 
-		WeekendGray:  color.RGBA{130, 130, 130, 255},
-		WeekendGreen: color.RGBA{90, 160, 110, 255},
-		WeekendBlue:  color.RGBA{90, 140, 200, 255},
-		WeekendRed:   color.RGBA{180, 90, 90, 255},
+		WeekendGray:  color.RGBA{140, 140, 140, 255},
+		WeekendGreen: color.RGBA{120, 200, 120, 255},
+		WeekendBlue:  color.RGBA{120, 160, 220, 255},
+		WeekendRed:   color.RGBA{220, 120, 120, 255},
 	}
 }

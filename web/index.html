@@ -189,6 +189,17 @@
             <div class="controls">
 
                 <div class="control">
+                    <label>iPhone model</label>
+                    <select id="device">
+                        <option value="iphone-15">iPhone 15 / 15 Pro</option>
+                        <option value="iphone-15-plus">iPhone 15 Plus</option>
+                        <option value="iphone-14">iPhone 14 / 13 / 12</option>
+                        <option value="iphone-mini">iPhone mini</option>
+                        <option value="iphone-se">iPhone SE</option>
+                    </select>
+                </div>
+
+                <div class="control">
                     <label>Language</label>
                     <select id="lang">
                         <option value="en">English</option>
@@ -233,8 +244,10 @@
         return `/wallpaper?mode=months&theme=ios`
             + `&lang=${lang.value}`
             + `&timezone=${tz.value}`
+            + `&device=${device.value}`
             + `&weekends=${weekends.value}`;
     }
+
 
     function update() {
         const u = buildURL();
