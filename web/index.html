@@ -17,12 +17,9 @@
 
         * { box-sizing: border-box; }
 
-        html, body {
-            height: 100%;
-        }
-
         body {
             margin: 0;
+            min-height: 100vh;
             background: radial-gradient(1200px 600px at top, #111 0%, var(--bg) 60%);
             color: var(--text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -32,7 +29,6 @@
             max-width: 980px;
             margin: 0 auto;
             padding: 32px 20px 80px;
-            min-height: 100vh;
         }
 
         h1 {
@@ -58,7 +54,7 @@
             .layout { grid-template-columns: 1fr; }
         }
 
-        /* ===== iPhone Preview ===== */
+        /* Phone preview */
 
         .phone-frame {
             width: 360px;
@@ -77,7 +73,6 @@
             height: 100%;
             border-radius: 36px;
             overflow: hidden;
-            background: #000;
             position: relative;
         }
 
@@ -90,7 +85,7 @@
             height: 34px;
             background: #000;
             border-radius: 18px;
-            z-index: 20;
+            z-index: 10;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
         }
 
@@ -101,12 +96,9 @@
             align-items: center;
             justify-content: center;
             transform-origin: center;
-            transition: transform .25s ease;
         }
 
-        .preview-viewport.fit      { transform: scale(0.25); }
         .preview-viewport.readable { transform: scale(0.29); }
-        .preview-viewport.full     { transform: scale(1); }
 
         .preview-viewport img {
             width: 1179px;
@@ -114,14 +106,7 @@
             image-rendering: crisp-edges;
         }
 
-        /* ===== AOD ===== */
-
-        .phone-screen.aod img {
-            filter: brightness(0.45) contrast(0.9) blur(0.3px);
-            opacity: 0.85;
-        }
-
-        /* ===== Controls ===== */
+        /* Controls */
 
         .controls {
             background: var(--card);
@@ -141,8 +126,7 @@
             margin-bottom: 6px;
         }
 
-        select,
-        input {
+        select, input {
             width: 100%;
             background: #1c1c1e;
             color: var(--text);
@@ -152,8 +136,7 @@
             font-size: 15px;
         }
 
-        select:focus,
-        input:focus {
+        select:focus, input:focus {
             border-color: var(--accent);
             outline: none;
         }
@@ -180,18 +163,6 @@
             cursor: pointer;
             border: none;
         }
-
-        /* Desktop scroll */
-        @media (min-width: 900px) {
-            html, body {
-                overflow: hidden;
-            }
-
-            .container {
-                max-height: 100vh;
-                overflow-y: auto;
-            }
-        }
     </style>
 </head>
 
@@ -203,15 +174,17 @@
 
     <div class="layout">
 
+        <!-- Preview -->
         <div class="phone-frame">
-            <div id="screen" class="phone-screen">
+            <div class="phone-screen">
                 <div class="dynamic-island"></div>
-                <div id="viewport" class="preview-viewport readable">
+                <div class="preview-viewport readable">
                     <img id="preview" />
                 </div>
             </div>
         </div>
 
+        <!-- Controls -->
         <div>
             <div class="controls">
 
@@ -229,27 +202,12 @@
                 </div>
 
                 <div class="control">
-                    <label>Preview size</label>
-                    <select id="previewSize">
-                        <option value="fit">Fit</option>
-                        <option value="readable" selected>Readable</option>
-                        <option value="full">1:1</option>
-                    </select>
-                </div>
-
-                <div class="control">
-                    <label>Always-On Display</label>
-                    <select id="aod">
-                        <option value="off">Off</option>
-                        <option value="on">On</option>
-                    </select>
-                </div>
-
-                <div class="control">
                     <label>Highlight weekends</label>
                     <select id="weekends">
-                        <option value="on" selected>On</option>
-                        <option value="off">Off</option>
+                        <option value="off">Off (gray)</option>
+                        <option value="green">Green</option>
+                        <option value="blue">Blue</option>
+                        <option value="red">Red</option>
                     </select>
                 </div>
 
@@ -265,18 +223,13 @@
 <script>
     const preview = document.getElementById("preview");
     const urlBox = document.getElementById("url");
+
     const lang = document.getElementById("lang");
     const tz = document.getElementById("tz");
-    const viewport = document.getElementById("viewport");
-    const previewSize = document.getElementById("previewSize");
-    const screen = document.getElementById("screen");
-    const aod = document.getElementById("aod");
     const weekends = document.getElementById("weekends");
-    const copy = document.getElementById("copy");
 
     function buildURL() {
-        return `/wallpaper?mode=months`
-            + `&theme=ios`
+        return `/wallpaper?mode=months&theme=ios`
             + `&lang=${lang.value}`
             + `&timezone=${tz.value}`
             + `&weekends=${weekends.value}`;
@@ -288,20 +241,12 @@
         urlBox.textContent = location.origin + u;
     }
 
-    previewSize.onchange = () =>
-        viewport.className = `preview-viewport ${previewSize.value}`;
+    document.querySelectorAll("select, input").forEach(el =>
+        el.addEventListener("change", update)
+    );
 
-    aod.onchange = () =>
-        screen.classList.toggle("aod", aod.value === "on");
-
-    lang.onchange = update;
-    tz.oninput = update;
-    weekends.onchange = update;
-
-    copy.onclick = () => {
+    document.getElementById("copy").onclick = () => {
         navigator.clipboard.writeText(urlBox.textContent);
-        copy.textContent = "Copied ✓";
-        setTimeout(() => copy.textContent = "Copy link", 1200);
     };
 
     update();
