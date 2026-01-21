@@ -71,7 +71,7 @@ func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
 	cols := 3
 
 	startY := TopSafe + 320 // где начинается первый ряд
-	rowGap := 100           // расстояние между рядами месяцев
+	rowGap := 180           // расстояние между рядами месяцев
 
 	cellW := Width / cols
 
