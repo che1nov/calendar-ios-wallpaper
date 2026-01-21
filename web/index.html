@@ -4,30 +4,27 @@
     <meta charset="UTF-8" />
     <title>Calendar Wallpaper</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
     <link rel="stylesheet" href="/web/style.css" />
 </head>
 
 <body>
-<div class="container">
-    <header>
+<div class="app">
+    <header class="header">
         <h1>Calendar Wallpaper</h1>
-        <p class="subtitle">
-            Dynamic iOS lock screen calendar wallpaper
-        </p>
+        <p>Minimal iOS lock screen calendar wallpaper</p>
     </header>
 
-    <div class="layout">
+    <div class="content">
         <!-- Preview -->
-        <div class="phone">
-            <div class="phone-screen">
-                <img id="preview" alt="Wallpaper preview" />
+        <div class="preview">
+            <div class="phone">
+                <img id="previewImage" />
             </div>
         </div>
 
         <!-- Controls -->
-        <div class="panel">
-            <div class="control">
+        <div class="controls">
+            <div class="group">
                 <label>iPhone model</label>
                 <select id="device">
                     <option value="iphone-se">iPhone SE</option>
@@ -37,7 +34,7 @@
                 </select>
             </div>
 
-            <div class="control">
+            <div class="group">
                 <label>Language</label>
                 <select id="lang">
                     <option value="en">English</option>
@@ -45,13 +42,13 @@
                 </select>
             </div>
 
-            <div class="control">
+            <div class="group">
                 <label>Timezone (UTC)</label>
                 <input id="timezone" type="number" value="3" />
             </div>
 
-            <div class="control">
-                <label>Weekend highlight</label>
+            <div class="group">
+                <label>Highlight weekends</label>
                 <select id="weekends">
                     <option value="off">Off</option>
                     <option value="gray">Gray</option>
@@ -61,7 +58,7 @@
                 </select>
             </div>
 
-            <div class="url-box">
+            <div class="link">
                 <div id="url"></div>
                 <button id="copy">Copy link</button>
             </div>

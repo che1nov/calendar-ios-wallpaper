@@ -1,4 +1,4 @@
-const preview = document.getElementById("preview");
+const preview = document.getElementById("previewImage");
 const device = document.getElementById("device");
 const lang = document.getElementById("lang");
 const tz = document.getElementById("timezone");
@@ -13,7 +13,6 @@ function buildURL() {
         timezone: tz.value,
         weekends: weekends.value,
     });
-
     return `/wallpaper?${params.toString()}`;
 }
 
@@ -28,10 +27,10 @@ function update() {
     el.addEventListener("input", update);
 });
 
-copyBtn.addEventListener("click", () => {
+copyBtn.onclick = () => {
     navigator.clipboard.writeText(urlBox.textContent);
     copyBtn.textContent = "Copied ✓";
     setTimeout(() => (copyBtn.textContent = "Copy link"), 1200);
-});
+};
 
 update();
