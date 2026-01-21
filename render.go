@@ -46,7 +46,7 @@ func RenderCalendar(
 	now time.Time,
 	theme Theme,
 	mode, lang string,
-	weekendMode string,
+	weekends string,
 ) *image.RGBA {
 
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
@@ -56,7 +56,7 @@ func RenderCalendar(
 
 	if mode == "months" {
 		months := BuildMonths(now, lang)
-		drawMonths(img, months, theme, weekendMode)
+		drawMonths(img, months, theme, weekends)
 
 		drawFooter(img, left, 100-percent, theme, lang)
 	}
@@ -89,7 +89,7 @@ func drawMonth(
 	cx, cy int,
 	m MonthData,
 	theme Theme,
-	weekendMode string,
+	weekends string,
 ) {
 	titleColor := theme.Text
 	if m.IsCurrent {
@@ -113,31 +113,36 @@ func drawMonth(
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		dotColor := theme.Future
+		colorDot := theme.Future
 
 		// прошедшие дни
 		if day < m.PassedDays {
-			dotColor = theme.Active
+			colorDot = theme.Active
 		}
 
 		// выходные
-		if col == 5 || col == 6 {
-			switch weekendMode {
+		isWeekend := col == 5 || col == 6 // Saturday / Sunday
+
+		if isWeekend {
+			switch weekends {
+			case "gray":
+				colorDot = theme.WeekendGray
 			case "green":
-				dotColor = theme.WeekendGreen
+				colorDot = theme.WeekendGreen
 			case "blue":
-				dotColor = theme.WeekendBlue
+				colorDot = theme.WeekendBlue
 			case "red":
-				dotColor = theme.WeekendRed
+				colorDot = theme.WeekendRed
+			case "off":
+				// ничего не делаем
 			}
 		}
-
 		// сегодня — всегда приоритет
 		if m.IsCurrent && day == m.PassedDays-1 {
-			dotColor = theme.Today
+			colorDot = theme.Today
 		}
 
-		drawCircle(img, x, y, radius, dotColor)
+		drawCircle(img, x, y, radius, colorDot)
 	}
 }
 

@@ -9,6 +9,7 @@ type Theme struct {
 	Text       color.RGBA
 	Today      color.RGBA
 
+	WeekendGray  color.RGBA
 	WeekendGreen color.RGBA
 	WeekendBlue  color.RGBA
 	WeekendRed   color.RGBA
@@ -22,8 +23,9 @@ func IOSTheme() Theme {
 		Text:       color.RGBA{200, 200, 200, 255},
 		Today:      color.RGBA{255, 140, 0, 255},
 
-		WeekendGreen: color.RGBA{110, 140, 110, 255},
-		WeekendBlue:  color.RGBA{110, 125, 150, 255},
-		WeekendRed:   color.RGBA{150, 110, 110, 255},
+		WeekendGray:  color.RGBA{130, 130, 130, 255},
+		WeekendGreen: color.RGBA{90, 160, 110, 255},
+		WeekendBlue:  color.RGBA{90, 140, 200, 255},
+		WeekendRed:   color.RGBA{180, 90, 90, 255},
 	}
 }

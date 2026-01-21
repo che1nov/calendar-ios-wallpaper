@@ -37,9 +37,9 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 	loc := time.FixedZone("user", tzOffset*3600)
 	now := time.Now().In(loc)
 
-	weekendMode := q.Get("weekends")
-	if weekendMode == "" {
-		weekendMode = "off"
+	weekends := q.Get("weekends")
+	if weekends == "" {
+		weekends = "off"
 	}
 
 	theme := IOSTheme()
@@ -49,7 +49,7 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		theme,
 		mode,
 		lang,
-		weekendMode,
+		weekends,
 	)
 
 	w.Header().Set("Content-Type", "image/png")
