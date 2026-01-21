@@ -70,7 +70,7 @@ func RenderCalendarWithLang(now time.Time, theme Theme, mode string, lang string
 func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
 	cols := 3
 
-	startY := TopSafe + 120 // где начинается первый ряд
+	startY := TopSafe + 240 // где начинается первый ряд
 	rowGap := 420           // расстояние между рядами месяцев
 
 	cellW := Width / cols
