@@ -61,7 +61,7 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 
 		passed := 0
 		if isCurrent {
-			passed = startWeekday + now.Day() - 1
+			passed = startWeekday + now.Day()
 		} else if int(now.Month()) > m {
 			passed = startWeekday + daysInMonth
 		}
