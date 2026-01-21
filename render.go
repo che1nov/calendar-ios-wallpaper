@@ -16,10 +16,6 @@ import (
 const (
 	Width  = 1179
 	Height = 2556
-
-	// iPhone 15 lock screen safe areas
-	TopSafe    = 380
-	BottomSafe = 200
 )
 
 var (
@@ -49,8 +45,9 @@ func init() {
 	})
 }
 
-// Главная функция рендера
-func RenderCalendarWithLang(now time.Time, theme Theme, mode string, lang string) *image.RGBA {
+// ===== MAIN RENDER =====
+
+func RenderCalendarWithLang(now time.Time, theme Theme, mode, lang string) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
 
@@ -61,11 +58,13 @@ func RenderCalendarWithLang(now time.Time, theme Theme, mode string, lang string
 		drawMonths(img, months, theme)
 
 		passed := 100 - percent
-		drawFooter(img, left, passed, theme)
+		drawFooter(img, left, passed, theme, lang)
 	}
 
 	return img
 }
+
+// ===== MONTH GRID =====
 
 func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
 	cols := 3
@@ -94,15 +93,14 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 		titleColor = theme.Today
 	}
 
-	// Название месяца — ближе к сетке
-	drawText(img, m.Name, cx, cy-80, titleColor, monthFace)
+	drawText(img, m.Name, cx, cy-70, titleColor, monthFace)
 
 	cols := 7
-	spacing := 32
+	spacing := 30
 	radius := 9
 
 	startX := cx - (cols-1)*spacing/2
-	startY := cy - 10
+	startY := cy - 5
 
 	for i := 0; i < m.Days; i++ {
 		x := startX + (i%cols)*spacing
@@ -120,14 +118,32 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 	}
 }
 
-func drawFooter(img *image.RGBA, left, passed int, theme Theme) {
-	text := fmt.Sprintf("%d d left   %d%%", left, passed)
+// ===== FOOTER =====
 
-	y := Height - BottomSafe + 60
-	drawText(img, text, Width/2, y, theme.Text, footerFace)
+func drawFooter(img *image.RGBA, left, passed int, theme Theme, lang string) {
+	text := footerText(left, passed, lang)
+	drawText(img, text, Width/2, footerY(), theme.Text, footerFace)
 }
 
-func drawText(img *image.RGBA, text string, cx int, y int, col color.Color, face font.Face) {
+func footerText(left, passed int, lang string) string {
+	switch lang {
+	case "ru":
+		return fmt.Sprintf("%d дн. осталось   %d%%", left, passed)
+	case "en":
+		return fmt.Sprintf("%d d left   %d%%", left, passed)
+	default:
+		return fmt.Sprintf("%d d left   %d%%", left, passed)
+	}
+}
+
+func footerY() int {
+	_, bottomSafe := calcSafeAreas(Height)
+	return Height - bottomSafe + 60
+}
+
+// ===== TEXT & SHAPES =====
+
+func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
 	d := &font.Drawer{
 		Dst:  img,
 		Src:  image.NewUniform(col),
@@ -149,8 +165,10 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 	}
 }
 
+// ===== SAFE AREAS =====
+
 func calcSafeAreas(height int) (top, bottom int) {
-	top = int(float64(height) * 0.25)    // ~18% под часы
-	bottom = int(float64(height) * 0.20) // ~14% под кнопки
+	top = int(float64(height) * 0.22)    // зона часов / island
+	bottom = int(float64(height) * 0.16) // зона кнопок
 	return
 }
