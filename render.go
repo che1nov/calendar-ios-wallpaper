@@ -84,7 +84,13 @@ func drawMonths(img *image.RGBA, months []MonthData, theme Theme, showWeekends b
 	}
 }
 
-func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme, showWeekends bool) {
+func drawMonth(
+	img *image.RGBA,
+	cx, cy int,
+	m MonthData,
+	theme Theme,
+	showWeekends bool,
+) {
 	titleColor := theme.Text
 	if m.IsCurrent {
 		titleColor = theme.Today
@@ -92,39 +98,39 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme, showWeeken
 
 	drawText(img, m.Name, cx, cy-80, titleColor, monthFace)
 
-	const spacing, radius = 32, 9
+	cols := 7
+	spacing := 32
+	radius := 9
 
-	startX := cx - (7-1)*spacing/2
+	startX := cx - (cols-1)*spacing/2
 	startY := cy - 10
 
 	for day := 0; day < m.Days; day++ {
-		index := m.StartWeekday + day
-		col := index % 7
-		row := index / 7
+		visualIndex := m.StartWeekday + day
+		col := visualIndex % 7
+		row := visualIndex / 7
 
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		isWeekend := col == 5 || col == 6
+		dotColor := theme.Future
 
-		dot := theme.Future
-
-		if showWeekends && isWeekend {
-			dot = theme.Weekend
-		}
-
+		// прошедшие дни
 		if day < m.PassedDays {
-			dot = theme.Active
-			if showWeekends && isWeekend {
-				dot = theme.Weekend
-			}
+			dotColor = theme.Active
 		}
 
+		// выходные (СБ=5, ВС=6)
+		if showWeekends && (col == 5 || col == 6) {
+			dotColor = theme.Weekend
+		}
+
+		// сегодня — ВСЕГДА приоритет
 		if m.IsCurrent && day == m.PassedDays-1 {
-			dot = theme.Today
+			dotColor = theme.Today
 		}
 
-		drawCircle(img, x, y, radius, dot)
+		drawCircle(img, x, y, radius, dotColor)
 	}
 }
 

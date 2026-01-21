@@ -11,18 +11,15 @@ type Theme struct {
 	Weekend    color.RGBA
 }
 
-var Themes = map[string]Theme{
-	"ios": {
-		Background: color.RGBA{0, 0, 0, 255},       // фон
-		Active:     color.RGBA{220, 220, 220, 255}, // прошедшие дни
-		Future:     color.RGBA{90, 90, 90, 255},    // будущие дни
-		Text:       color.RGBA{200, 200, 200, 255}, // текст
-		Today:      color.RGBA{255, 140, 0, 255},   // сегодня
-		Weekend:    color.RGBA{120, 120, 120, 255}, // выходные
-	},
-}
-
-// Используется в handler.go
 func IOSTheme() Theme {
-	return Themes["ios"]
+	return Theme{
+		Background: color.RGBA{0, 0, 0, 255},
+		Active:     color.RGBA{220, 220, 220, 255},
+		Future:     color.RGBA{90, 90, 90, 255},
+		Text:       color.RGBA{200, 200, 200, 255},
+		Today:      color.RGBA{255, 140, 0, 255},
+
+		// МЯГКИЙ зелёный (полутон, не неон)
+		Weekend: color.RGBA{110, 140, 110, 255},
+	}
 }
