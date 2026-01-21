@@ -98,11 +98,11 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 	drawText(img, m.Name, cx, cy-80, titleColor, monthFace)
 
 	cols := 7
-	spacing := 32 // ⬅️ было 36
-	radius := 9   // ⬅️ было 10
+	spacing := 32
+	radius := 9
 
 	startX := cx - (cols-1)*spacing/2
-	startY := cy - 10 // ⬅️ было -10, оставляем компактно
+	startY := cy - 10
 
 	for i := 0; i < m.Days; i++ {
 		x := startX + (i%cols)*spacing
@@ -150,7 +150,7 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 }
 
 func calcSafeAreas(height int) (top, bottom int) {
-	top = int(float64(height) * 0.18)    // ~18% под часы
-	bottom = int(float64(height) * 0.14) // ~14% под кнопки
+	top = int(float64(height) * 0.20)    // ~18% под часы
+	bottom = int(float64(height) * 0.20) // ~14% под кнопки
 	return
 }
