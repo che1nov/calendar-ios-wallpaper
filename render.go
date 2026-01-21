@@ -5,31 +5,12 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	"os"
 	"time"
 
 	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
+	"golang.org/x/image/font/basicfont"
 	"golang.org/x/image/math/fixed"
 )
-
-var fontBase *opentype.Font
-
-func init() {
-	b, err := os.ReadFile("fonts/Inter-Regular.ttf")
-	if err != nil {
-		panic(err)
-	}
-	fontBase, _ = opentype.Parse(b)
-}
-
-func makeFont(size float64) font.Face {
-	f, _ := opentype.NewFace(fontBase, &opentype.FaceOptions{
-		Size: size,
-		DPI:  72,
-	})
-	return f
-}
 
 func RenderCalendar(
 	now time.Time,
@@ -41,125 +22,94 @@ func RenderCalendar(
 	img := image.NewRGBA(image.Rect(0, 0, device.Width, device.Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
 
+	if mode != "months" {
+		return img
+	}
+
 	months := BuildMonths(now, lang)
 
-	drawMonths(img, months, device, theme, weekends)
+	top := device.TopInset + device.ClockInset
+	bottom := device.BottomInset
 
-	_, left, percent := Progress(now)
-	drawFooter(img, left, 100-percent, device, theme, lang)
+	gridHeight := device.Height - top - bottom
+
+	cellW := device.Width / 3
+	cellH := gridHeight / 4
+
+	for i, m := range months {
+		c := i % 3
+		r := i / 3
+
+		cx := c*cellW + cellW/2
+		cy := top + r*cellH + cellH/2
+
+		drawMonth(img, cx, cy, m, theme, weekends)
+	}
+
+	drawFooter(img, device, theme, lang, now)
 
 	return img
 }
 
-func drawMonths(
-	img *image.RGBA,
-	months []MonthData,
-	device DeviceProfile,
-	theme Theme,
-	weekends string,
-) {
-	const cols, rows = 3, 4
+func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme, weekends string) {
+	drawText(img, m.Name, cx, cy-70, theme.Text)
 
-	// контент строго между safe-зонами
-	contentTop := device.TopSafe
-	contentBottom := device.Height - device.BottomSafe - device.FooterOffset - int(device.FooterFont) - 20
+	spacing := 30
+	radius := 8
+	startX := cx - 3*spacing
+	startY := cy - 10
 
-	usableHeight := contentBottom - contentTop
+	for d := 0; d < m.Days; d++ {
+		i := m.StartWeekday + d
+		col := i % 7
+		row := i / 7
 
-	cellW := device.Width / cols
-	cellH := usableHeight / rows
+		x := startX + col*spacing
+		y := startY + row*spacing
 
-	for i, m := range months {
-		c := i % cols
-		r := i / cols
+		colorDot := theme.Future
 
-		cx := c*cellW + cellW/2
-		cy := contentTop + r*cellH + cellH/2
-
-		drawMonth(img, cx, cy, m, device, theme, weekends)
-	}
-}
-
-func drawMonth(
-	img *image.RGBA,
-	cx, cy int,
-	m MonthData,
-	device DeviceProfile,
-	theme Theme,
-	weekends string,
-) {
-	monthFace := makeFont(device.MonthFont)
-
-	drawText(img, m.Name, cx, cy-70, theme.Text, monthFace)
-
-	startX := cx - (6 * device.DotSpacing / 2)
-	startY := cy
-
-	for day := 0; day < m.Days; day++ {
-		idx := m.StartWeekday + day
-		col := idx % 7
-		row := idx / 7
-
-		x := startX + col*device.DotSpacing
-		y := startY + row*device.DotSpacing
-
-		dot := theme.Future
-		if day < m.PassedDays {
-			dot = theme.Active
+		if d < m.PassedDays {
+			colorDot = theme.Active
 		}
 
 		if col >= 5 {
 			switch weekends {
 			case "gray":
-				dot = theme.WeekendGray
+				colorDot = theme.WeekendGray
 			case "green":
-				dot = theme.WeekendGreen
+				colorDot = theme.WeekendGreen
 			case "blue":
-				dot = theme.WeekendBlue
+				colorDot = theme.WeekendBlue
 			case "red":
-				dot = theme.WeekendRed
+				colorDot = theme.WeekendRed
 			}
 		}
 
-		if m.IsCurrent && day == m.PassedDays-1 {
-			dot = theme.Today
+		if m.IsCurrent && d == m.PassedDays-1 {
+			colorDot = theme.Today
 		}
 
-		drawCircle(img, x, y, device.DotRadius, dot)
+		drawCircle(img, x, y, radius, colorDot)
 	}
 }
 
-func drawFooter(
-	img *image.RGBA,
-	left, percent int,
-	device DeviceProfile,
-	theme Theme,
-	lang string,
-) {
-	footerFace := makeFont(device.FooterFont)
-
-	text := footerText(left, percent, lang)
-
-	y := device.Height -
-		device.BottomSafe -
-		device.FooterOffset
-
-	drawText(img, text, device.Width/2, y, theme.Text, footerFace)
-}
-
-func footerText(left, percent int, lang string) string {
+func drawFooter(img *image.RGBA, device DeviceProfile, theme Theme, lang string, now time.Time) {
+	left := 365 - now.YearDay()
+	txt := fmt.Sprintf("%d d left", left)
 	if lang == "ru" {
-		return fmt.Sprintf("%dдн. осталось   %d%%", left, percent)
+		txt = fmt.Sprintf("%d дн. осталось", left)
 	}
-	return fmt.Sprintf("%dd left   %d%%", left, percent)
+	drawText(img, txt, device.Width/2, device.Height-device.BottomInset+40, theme.Text)
 }
 
-func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
+func drawText(img *image.RGBA, text string, cx, y int, col color.Color) {
 	d := &font.Drawer{
 		Dst:  img,
 		Src:  image.NewUniform(col),
-		Face: face,
+		Face: basicfont.Face7x13,
 	}
+
 	w := d.MeasureString(text).Round()
 	d.Dot = fixed.P(cx-w/2, y)
 	d.DrawString(text)

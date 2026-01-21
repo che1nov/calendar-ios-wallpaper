@@ -1,81 +1,45 @@
 package main
 
 type DeviceProfile struct {
-	Key string
-
-	Width  int
-	Height int
-
-	TopSafe    int
-	BottomSafe int
-
-	FooterOffset int
-
-	MonthFont  float64
-	FooterFont float64
-
-	DotRadius  int
-	DotSpacing int
+	Key         string
+	Width       int
+	Height      int
+	TopInset    int // island / notch
+	ClockInset  int // ЧАСЫ + системный текст
+	BottomInset int // кнопки
 }
 
 var Devices = map[string]DeviceProfile{
-	// ===== SE =====
 	"iphone-se": {
-		Key:          "iphone-se",
-		Width:        750,
-		Height:       1334,
-		TopSafe:      120,
-		BottomSafe:   90,
-		FooterOffset: 40,
-
-		MonthFont:  26,
-		FooterFont: 20,
-		DotRadius:  6,
-		DotSpacing: 22,
+		Key:         "iphone-se",
+		Width:       750,
+		Height:      1334,
+		TopInset:    80,
+		ClockInset:  260,
+		BottomInset: 160,
 	},
-
-	// ===== MINI =====
-	"iphone-13-mini": {
-		Key:          "iphone-13-mini",
-		Width:        1080,
-		Height:       2340,
-		TopSafe:      300,
-		BottomSafe:   200,
-		FooterOffset: 60,
-
-		MonthFont:  32,
-		FooterFont: 26,
-		DotRadius:  8,
-		DotSpacing: 28,
+	"iphone-11": {
+		Key:         "iphone-11",
+		Width:       828,
+		Height:      1792,
+		TopInset:    120,
+		ClockInset:  360,
+		BottomInset: 200,
 	},
-
-	// ===== STANDARD =====
+	"iphone-14": {
+		Key:         "iphone-14",
+		Width:       1170,
+		Height:      2532,
+		TopInset:    160,
+		ClockInset:  420,
+		BottomInset: 240,
+	},
 	"iphone-15": {
-		Key:          "iphone-15",
-		Width:        1179,
-		Height:       2556,
-		TopSafe:      380,
-		BottomSafe:   210,
-		FooterOffset: 70,
-
-		MonthFont:  40,
-		FooterFont: 34,
-		DotRadius:  9,
-		DotSpacing: 34,
-	},
-
-	// ===== PRO MAX =====
-	"iphone-15-pro-max": {
-		Key:          "iphone-15-pro-max",
-		Width:        1290,
-		Height:       2796,
-		TopSafe:      420,
-		BottomSafe:   240,
-		FooterOffset: 80,
-
-		MonthFont:  44,
-		FooterFont: 38,
-		DotRadius:  10,
-		DotSpacing: 38,
+		Key:         "iphone-15",
+		Width:       1179,
+		Height:      2556,
+		TopInset:    180,
+		ClockInset:  440,
+		BottomInset: 260,
 	},
 }

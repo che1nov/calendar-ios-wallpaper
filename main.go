@@ -1,15 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 )
 
 func main() {
-	registerHandlers()
-
-	fmt.Println("Listening on port 8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		panic(err)
-	}
+	RegisterHandlers()
+	log.Println("Listening on :8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
