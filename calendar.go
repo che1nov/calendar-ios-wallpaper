@@ -43,13 +43,14 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 
 	for m := 1; m <= 12; m++ {
 		first := time.Date(year, time.Month(m), 1, 0, 0, 0, 0, loc)
-		daysInMonth := first.AddDate(0, 1, -1).Day()
 
-		// Go: Sunday=0 … Saturday=6
-		// Convert to Monday=0 … Sunday=6
+		// сколько дней в месяце (ГО корректно учитывает високосные)
+		daysInMonth := time.Date(year, time.Month(m)+1, 0, 0, 0, 0, 0, loc).Day()
+
+		// Go: Sunday = 0 → ISO: Monday = 0
 		startWeekday := (int(first.Weekday()) + 6) % 7
 
-		isCurrent := now.Year() == year && int(now.Month()) == m
+		isCurrent := int(now.Month()) == m
 
 		passed := 0
 		if isCurrent {
@@ -61,8 +62,8 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 		months[m-1] = MonthData{
 			Name:         names[m-1],
 			Days:         daysInMonth,
-			PassedDays:   passed,
 			StartWeekday: startWeekday,
+			PassedDays:   passed,
 			IsCurrent:    isCurrent,
 		}
 	}
