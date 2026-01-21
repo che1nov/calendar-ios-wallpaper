@@ -8,36 +8,64 @@ import (
 )
 
 func RegisterHandlers() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/index.html")
-	})
-
+	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/wallpaper", wallpaperHandler)
 }
+
+/* ================= INDEX ================= */
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "web/index.html")
+}
+
+/* ================= WALLPAPER ================= */
 
 func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 
-	device := Devices[q.Get("device")]
+	// ---- DEVICE ----
+	deviceKey := q.Get("device")
+	device, ok := Devices[deviceKey]
+	if !ok {
+		device = detectDeviceFromUA(r.UserAgent())
+	}
 	if device.Key == "" {
 		device = Devices["iphone-15"]
 	}
 
+	// ---- LANGUAGE ----
 	lang := q.Get("lang")
 	if lang == "" {
 		lang = "en"
 	}
 
+	// ---- WEEKENDS ----
 	weekends := q.Get("weekends")
 	if weekends == "" {
 		weekends = "off"
 	}
 
-	tz, _ := strconv.Atoi(q.Get("timezone"))
-	now := time.Now().In(time.FixedZone("user", tz*3600))
+	// ---- TIMEZONE ----
+	tzOffset := 0
+	if tzStr := q.Get("timezone"); tzStr != "" {
+		if v, err := strconv.Atoi(tzStr); err == nil {
+			tzOffset = v
+		}
+	}
 
-	img := RenderCalendar(now, device, IOSTheme(), "months", lang, weekends)
+	loc := time.FixedZone("user", tzOffset*3600)
+	now := time.Now().In(loc)
+
+	// ---- RENDER ----
+	img := RenderCalendar(
+		now,
+		device,
+		IOSTheme(),
+		"months",
+		lang,
+		weekends,
+	)
 
 	w.Header().Set("Content-Type", "image/png")
-	png.Encode(w, img)
+	_ = png.Encode(w, img)
 }

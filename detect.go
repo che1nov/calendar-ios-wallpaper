@@ -44,3 +44,16 @@ func DetectDeviceProfile(r *http.Request) DeviceProfile {
 	// --- Default ---
 	return Devices["iphone-15"]
 }
+
+func detectDeviceFromUA(ua string) DeviceProfile {
+	ua = strings.ToLower(ua)
+
+	switch {
+	case strings.Contains(ua, "iphone se"):
+		return Devices["iphone-se"]
+	case strings.Contains(ua, "iphone"):
+		return Devices["iphone-15"]
+	default:
+		return Devices["iphone-15"]
+	}
+}
