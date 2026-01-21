@@ -93,16 +93,15 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 		titleColor = theme.Today
 	}
 
-	// Заголовок месяца
-	drawText(img, m.Name, cx, cy-110, titleColor, monthFace)
+	// Название месяца — ближе к сетке
+	drawText(img, m.Name, cx, cy-80, titleColor, monthFace)
 
 	cols := 7
-	spacing := 36
-	radius := 10
+	spacing := 32 // ⬅️ было 36
+	radius := 9   // ⬅️ было 10
 
-	// ВАЖНО: правильное центрирование сетки
 	startX := cx - (cols-1)*spacing/2
-	startY := cy - 10
+	startY := cy - 10 // ⬅️ было -10, оставляем компактно
 
 	for i := 0; i < m.Days; i++ {
 		x := startX + (i%cols)*spacing
@@ -123,7 +122,7 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 func drawFooter(img *image.RGBA, left, passed int, theme Theme) {
 	text := fmt.Sprintf("%d d left   %d%%", left, passed)
 
-	y := Height - BottomSafe + 80
+	y := Height - BottomSafe + 60
 	drawText(img, text, Width/2, y, theme.Text, footerFace)
 }
 
