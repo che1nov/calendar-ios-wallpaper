@@ -106,6 +106,8 @@ func drawMonth(
 	startY := cy - 10
 
 	for day := 0; day < m.Days; day++ {
+
+		// позиция в сетке
 		visualIndex := m.StartWeekday + day
 		col := visualIndex % 7
 		row := visualIndex / 7
@@ -113,36 +115,33 @@ func drawMonth(
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		colorDot := theme.Future
+		dotColor := theme.Future
 
 		// прошедшие дни
-		if day < m.PassedDays {
-			colorDot = theme.Active
+		if day+1 < m.PassedDays {
+			dotColor = theme.Active
 		}
 
-		// выходные
-		isWeekend := col == 5 || col == 6 // Saturday / Sunday
-
-		if isWeekend {
+		// выходные (Сб = 5, Вс = 6)
+		if col == 5 || col == 6 {
 			switch weekends {
 			case "gray":
-				colorDot = theme.WeekendGray
+				dotColor = theme.WeekendGray
 			case "green":
-				colorDot = theme.WeekendGreen
+				dotColor = theme.WeekendGreen
 			case "blue":
-				colorDot = theme.WeekendBlue
+				dotColor = theme.WeekendBlue
 			case "red":
-				colorDot = theme.WeekendRed
-			case "off":
-				// ничего не делаем
+				dotColor = theme.WeekendRed
 			}
 		}
-		// сегодня — всегда приоритет
-		if m.IsCurrent && day == m.PassedDays-1 {
-			colorDot = theme.Today
+
+		// СЕГОДНЯ — абсолютный приоритет
+		if m.IsCurrent && day+1 == m.PassedDays {
+			dotColor = theme.Today
 		}
 
-		drawCircle(img, x, y, radius, colorDot)
+		drawCircle(img, x, y, radius, dotColor)
 	}
 }
 
