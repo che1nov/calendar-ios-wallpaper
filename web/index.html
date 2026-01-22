@@ -7,202 +7,197 @@
 
     <style>
         :root {
-            --bg: #0b0b0b;
-            --card: #141414;
-            --border: #2a2a2a;
-            --muted: #8e8e93;
-            --text: #ffffff;
-            --accent: #ff9f0a;
+            --bg:#0b0b0b;
+            --card:#141414;
+            --border:#2a2a2a;
+            --muted:#8e8e93;
+            --text:#fff;
+            --accent:#ff9f0a;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing:border-box; }
 
         body {
-            margin: 0;
-            min-height: 100vh;
-            background: radial-gradient(1200px 600px at top, #111 0%, var(--bg) 60%);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin:0;
+            min-height:100vh;
+            background:radial-gradient(1200px 600px at top,#111 0%,var(--bg) 60%);
+            color:var(--text);
+            font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
         }
 
         .container {
-            max-width: 980px;
-            margin: 0 auto;
-            padding: 32px 20px 80px;
+            max-width:980px;
+            margin:0 auto;
+            padding:32px 20px 80px;
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin: 0 0 8px;
+            font-size:28px;
+            font-weight:600;
+            margin:0 0 8px;
         }
 
         .subtitle {
-            font-size: 15px;
-            color: var(--muted);
-            margin-bottom: 32px;
+            font-size:15px;
+            color:var(--muted);
+            margin-bottom:32px;
         }
 
         .layout {
-            display: grid;
-            grid-template-columns: 360px 1fr;
-            gap: 32px;
+            display:grid;
+            grid-template-columns:360px 1fr;
+            gap:32px;
         }
 
-        @media (max-width: 900px) {
-            .layout { grid-template-columns: 1fr; }
+        @media (max-width:900px) {
+            .layout { grid-template-columns:1fr; }
         }
 
-        /* =========================
-           PHONE PREVIEW
-           ========================= */
+        /* ================= PHONE PREVIEW ================= */
 
         .phone-frame {
-            width: 360px;
-            height: 740px;
-            padding: 14px;
-            border-radius: 46px;
-            background: #000;
-            box-shadow: 0 30px 80px rgba(0,0,0,.8),
+            width:360px;
+            height:740px;
+            padding:14px;
+            border-radius:46px;
+            background:#000;
+            box-shadow:0 30px 80px rgba(0,0,0,.8),
             inset 0 0 0 2px rgba(255,255,255,.06);
         }
 
         .phone-screen {
-            width: 100%;
-            height: 100%;
-            border-radius: 36px;
-            background: #000;
-            position: relative;
-            overflow: hidden;
+            width:100%;
+            height:100%;
+            border-radius:36px;
+            background:#000;
+            position:relative;
+            overflow:hidden;
         }
 
         .dynamic-island {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 34px;
-            border-radius: 18px;
-            background: #000;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
-            z-index: 20;
+            position:absolute;
+            top:12px;
+            left:50%;
+            transform:translateX(-50%);
+            width:120px;
+            height:34px;
+            border-radius:18px;
+            background:#000;
+            box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+            z-index:20;
         }
 
+        /* Wallpaper image */
         .preview-viewport {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: scale(0.29);
+            width:100%;
+            height:100%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            transform:scale(0.29);
         }
 
         .preview-viewport img {
-            width: 1179px;
-            height: 2556px;
-            image-rendering: crisp-edges;
+            width:1179px;
+            height:2556px;
+            image-rendering:crisp-edges;
         }
 
-        /* =========================
-           SAFE ZONES (PREVIEW ONLY)
-           ========================= */
+        /* ================= SAFE ZONES (PREVIEW ONLY) ================= */
 
         .ios-safe {
-            position: absolute;
-            left: 16px;
-            right: 16px;
-            border-radius: 18px;
-            border: 1px dashed rgba(255,255,255,0.35);
-            background: rgba(120,180,255,0.08);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            z-index: 15;
+            position:absolute;
+            left:18px;
+            right:18px;
+            border-radius:18px;
+            border:1px dashed rgba(255,255,255,0.25);
+            background:rgba(120,180,255,0.05);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            pointer-events:none;
+            z-index:5; /* ниже контента */
         }
 
         .ios-safe span {
-            font-size: 12px;
-            color: rgba(255,255,255,0.65);
-            background: rgba(0,0,0,0.45);
-            padding: 4px 10px;
-            border-radius: 12px;
+            font-size:12px;
+            color:rgba(255,255,255,0.6);
+            background:rgba(0,0,0,0.45);
+            padding:4px 10px;
+            border-radius:12px;
         }
 
+        /* Clock / Date */
         .top-safe {
-            top: 70px;
-            height: 120px;
+            top:72px;
+            height:110px;
         }
 
+        /* Buttons (preview hint only, below footer) */
         .bottom-safe {
-            bottom: 110px;
-            height: 120px;
+            bottom:32px;
+            height:60px;
         }
 
-        /* =========================
-           CONTROLS
-           ========================= */
+        /* ================= CONTROLS ================= */
 
         .controls {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:20px;
+            padding:24px;
         }
 
-        .control {
-            margin-bottom: 18px;
-        }
+        .control { margin-bottom:18px; }
 
         label {
-            display: block;
-            font-size: 13px;
-            color: var(--muted);
-            margin-bottom: 6px;
+            display:block;
+            font-size:13px;
+            color:var(--muted);
+            margin-bottom:6px;
         }
 
-        select, input {
-            width: 100%;
-            padding: 12px 14px;
-            font-size: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            background: #1c1c1e;
-            color: var(--text);
+        select,input {
+            width:100%;
+            padding:12px 14px;
+            font-size:15px;
+            border-radius:12px;
+            border:1px solid var(--border);
+            background:#1c1c1e;
+            color:var(--text);
         }
 
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--accent);
+        select:focus,input:focus {
+            outline:none;
+            border-color:var(--accent);
         }
 
         .url-box {
-            margin-top: 24px;
-            padding: 16px;
-            background: #0f0f0f;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            font-size: 13px;
-            word-break: break-all;
-            color: #d1d1d6;
+            margin-top:24px;
+            padding:16px;
+            background:#0f0f0f;
+            border-radius:16px;
+            border:1px solid var(--border);
+            font-size:13px;
+            word-break:break-all;
+            color:#d1d1d6;
         }
 
         .copy {
-            margin-top: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            border: none;
-            background: var(--accent);
-            color: #000;
-            font-weight: 500;
-            cursor: pointer;
+            margin-top:12px;
+            padding:10px 14px;
+            border-radius:12px;
+            border:none;
+            background:var(--accent);
+            color:#000;
+            font-weight:500;
+            cursor:pointer;
         }
 
         .hint {
-            margin-top: 14px;
-            font-size: 13px;
-            color: var(--muted);
+            margin-top:14px;
+            font-size:13px;
+            color:var(--muted);
         }
     </style>
 </head>
@@ -215,23 +210,19 @@
 
     <div class="layout">
 
-        <!-- PHONE PREVIEW -->
+        <!-- PHONE -->
         <div class="phone-frame">
             <div class="phone-screen">
 
                 <div class="dynamic-island"></div>
 
-                <div class="ios-safe top-safe">
-                    <span>Clock / Date</span>
-                </div>
-
-                <div class="ios-safe bottom-safe">
-                    <span>Lock screen buttons</span>
-                </div>
+                <div class="ios-safe top-safe"><span>Clock / Date</span></div>
+                <div class="ios-safe bottom-safe"><span>Lock screen buttons</span></div>
 
                 <div class="preview-viewport">
                     <img id="preview">
                 </div>
+
             </div>
         </div>
 
@@ -242,10 +233,11 @@
                 <div class="control">
                     <label>iPhone model</label>
                     <select id="device">
-                        <option value="iphone-se">iPhone SE</option>
-                        <option value="iphone-11">iPhone 11</option>
-                        <option value="iphone-14">iPhone 14</option>
                         <option value="iphone-15" selected>iPhone 15</option>
+                        <option value="iphone-14">iPhone 14</option>
+                        <option value="iphone-13">iPhone 13</option>
+                        <option value="iphone-12">iPhone 12</option>
+                        <option value="iphone-se-2">iPhone SE (2nd / 3rd gen)</option>
                     </select>
                 </div>
 
@@ -290,20 +282,21 @@
                 Safe zones are preview-only and not included in the wallpaper image.
             </div>
         </div>
+
     </div>
 </div>
 
 <script>
-    const preview = document.getElementById("preview");
-    const urlBox = document.getElementById("url");
-    const device = document.getElementById("device");
-    const lang = document.getElementById("lang");
-    const tz = document.getElementById("tz");
-    const weekends = document.getElementById("weekends");
-    const safeZones = document.getElementById("safeZones");
-    const zones = document.querySelectorAll(".ios-safe");
+    const preview=document.getElementById("preview");
+    const urlBox=document.getElementById("url");
+    const device=document.getElementById("device");
+    const lang=document.getElementById("lang");
+    const tz=document.getElementById("tz");
+    const weekends=document.getElementById("weekends");
+    const safeZones=document.getElementById("safeZones");
+    const zones=document.querySelectorAll(".ios-safe");
 
-    function buildURL() {
+    function buildURL(){
         return `/wallpaper?mode=months`
             + `&device=${device.value}`
             + `&lang=${lang.value}`
@@ -311,24 +304,23 @@
             + `&weekends=${weekends.value}`;
     }
 
-    function update() {
-        const url = buildURL();
-        preview.src = url;
-        urlBox.textContent = location.origin + url;
+    function update(){
+        const url=buildURL();
+        preview.src=url;
+        urlBox.textContent=location.origin+url;
     }
 
-    device.onchange = update;
-    lang.onchange = update;
-    tz.oninput = update;
-    weekends.onchange = update;
+    device.onchange=update;
+    lang.onchange=update;
+    tz.oninput=update;
+    weekends.onchange=update;
 
-    safeZones.onchange = () => {
-        zones.forEach(z =>
-            z.style.display = safeZones.value === "on" ? "flex" : "none"
-        );
+    safeZones.onchange=()=>{
+        zones.forEach(z=>z.style.display=
+            safeZones.value==="on"?"flex":"none");
     };
 
-    document.getElementById("copy").onclick = () => {
+    document.getElementById("copy").onclick=()=>{
         navigator.clipboard.writeText(urlBox.textContent);
     };
 

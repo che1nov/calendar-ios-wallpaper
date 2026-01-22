@@ -1,41 +1,12 @@
 package main
 
 import (
-	"image/png"
-	"log"
+	"fmt"
 	"net/http"
-	"strconv"
-	"time"
 )
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/index.html")
-	})
-
-	http.HandleFunc("/wallpaper", func(w http.ResponseWriter, r *http.Request) {
-		q := r.URL.Query()
-
-		lang := q.Get("lang")
-		if lang == "" {
-			lang = "en"
-		}
-
-		tz, _ := strconv.Atoi(q.Get("timezone"))
-		loc := time.FixedZone("user", tz*3600)
-		now := time.Now().In(loc)
-
-		weekends := q.Get("weekends")
-		if weekends == "" {
-			weekends = "off"
-		}
-
-		img := RenderCalendar(now, IOSTheme(), "months", lang, weekends)
-
-		w.Header().Set("Content-Type", "image/png")
-		_ = png.Encode(w, img)
-	})
-
-	log.Println("Listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	RegisterHandlers()
+	fmt.Println("Listening on :8080")
+	http.ListenAndServe(":8080", nil)
 }
