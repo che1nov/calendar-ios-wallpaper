@@ -1,28 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Calendar Wallpaper</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
     <style>
         :root {
             --bg: #0b0b0b;
             --card: #141414;
+            --border: #2a2a2a;
             --muted: #8e8e93;
             --text: #ffffff;
             --accent: #ff9f0a;
-            --border: #2a2a2a;
         }
 
         * { box-sizing: border-box; }
 
-        html, body {
-            margin: 0;
-            height: 100%;
-        }
-
         body {
+            margin: 0;
+            min-height: 100vh;
             background: radial-gradient(1200px 600px at top, #111 0%, var(--bg) 60%);
             color: var(--text);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -32,7 +29,6 @@
             max-width: 980px;
             margin: 0 auto;
             padding: 32px 20px 80px;
-            min-height: 100vh;
         }
 
         h1 {
@@ -42,8 +38,8 @@
         }
 
         .subtitle {
-            color: var(--muted);
             font-size: 15px;
+            color: var(--muted);
             margin-bottom: 32px;
         }
 
@@ -51,34 +47,33 @@
             display: grid;
             grid-template-columns: 360px 1fr;
             gap: 32px;
-            align-items: start;
         }
 
         @media (max-width: 900px) {
             .layout { grid-template-columns: 1fr; }
         }
 
-        /* ===== iPhone preview ===== */
+        /* =========================
+           PHONE PREVIEW
+           ========================= */
 
         .phone-frame {
             width: 360px;
             height: 740px;
+            padding: 14px;
             border-radius: 46px;
             background: #000;
-            position: relative;
-            box-shadow:
-                    0 30px 80px rgba(0,0,0,.8),
-                    inset 0 0 0 2px rgba(255,255,255,.06);
-            padding: 14px;
+            box-shadow: 0 30px 80px rgba(0,0,0,.8),
+            inset 0 0 0 2px rgba(255,255,255,.06);
         }
 
         .phone-screen {
             width: 100%;
             height: 100%;
             border-radius: 36px;
-            overflow: hidden;
             background: #000;
             position: relative;
+            overflow: hidden;
         }
 
         .dynamic-island {
@@ -88,10 +83,10 @@
             transform: translateX(-50%);
             width: 120px;
             height: 34px;
-            background: #000;
             border-radius: 18px;
-            z-index: 10;
+            background: #000;
             box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+            z-index: 20;
         }
 
         .preview-viewport {
@@ -100,13 +95,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transform-origin: center;
-            transition: transform .25s ease;
+            transform: scale(0.29);
         }
-
-        .preview-viewport.fit      { transform: scale(0.25); }
-        .preview-viewport.readable { transform: scale(0.29); }
-        .preview-viewport.full     { transform: scale(1); }
 
         .preview-viewport img {
             width: 1179px;
@@ -114,14 +104,45 @@
             image-rendering: crisp-edges;
         }
 
-        /* ===== AOD ===== */
+        /* =========================
+           SAFE ZONES (PREVIEW ONLY)
+           ========================= */
 
-        .phone-screen.aod img {
-            filter: brightness(0.45) contrast(0.9) blur(0.3px);
-            opacity: 0.85;
+        .ios-safe {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            border-radius: 18px;
+            border: 1px dashed rgba(255,255,255,0.35);
+            background: rgba(120,180,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 15;
         }
 
-        /* ===== Controls ===== */
+        .ios-safe span {
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+            background: rgba(0,0,0,0.45);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .top-safe {
+            top: 70px;
+            height: 120px;
+        }
+
+        .bottom-safe {
+            bottom: 110px;
+            height: 120px;
+        }
+
+        /* =========================
+           CONTROLS
+           ========================= */
 
         .controls {
             background: var(--card);
@@ -131,7 +152,7 @@
         }
 
         .control {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         label {
@@ -141,29 +162,27 @@
             margin-bottom: 6px;
         }
 
-        select,
-        input {
+        select, input {
             width: 100%;
-            background: #1c1c1e;
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 12px;
             padding: 12px 14px;
             font-size: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #1c1c1e;
+            color: var(--text);
         }
 
-        select:focus,
-        input:focus {
-            border-color: var(--accent);
+        select:focus, input:focus {
             outline: none;
+            border-color: var(--accent);
         }
 
         .url-box {
             margin-top: 24px;
-            background: #0f0f0f;
-            border: 1px solid var(--border);
-            border-radius: 16px;
             padding: 16px;
+            background: #0f0f0f;
+            border-radius: 16px;
+            border: 1px solid var(--border);
             font-size: 13px;
             word-break: break-all;
             color: #d1d1d6;
@@ -171,18 +190,17 @@
 
         .copy {
             margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: none;
             background: var(--accent);
             color: #000;
-            border-radius: 12px;
-            padding: 10px 14px;
-            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            border: none;
         }
 
         .hint {
-            margin-top: 16px;
+            margin-top: 14px;
             font-size: 13px;
             color: var(--muted);
         }
@@ -197,17 +215,39 @@
 
     <div class="layout">
 
+        <!-- PHONE PREVIEW -->
         <div class="phone-frame">
-            <div id="screen" class="phone-screen">
+            <div class="phone-screen">
+
                 <div class="dynamic-island"></div>
-                <div id="viewport" class="preview-viewport readable">
-                    <img id="preview" />
+
+                <div class="ios-safe top-safe">
+                    <span>Clock / Date</span>
+                </div>
+
+                <div class="ios-safe bottom-safe">
+                    <span>Lock screen buttons</span>
+                </div>
+
+                <div class="preview-viewport">
+                    <img id="preview">
                 </div>
             </div>
         </div>
 
+        <!-- CONTROLS -->
         <div>
             <div class="controls">
+
+                <div class="control">
+                    <label>iPhone model</label>
+                    <select id="device">
+                        <option value="iphone-se">iPhone SE</option>
+                        <option value="iphone-11">iPhone 11</option>
+                        <option value="iphone-14">iPhone 14</option>
+                        <option value="iphone-15" selected>iPhone 15</option>
+                    </select>
+                </div>
 
                 <div class="control">
                     <label>Language</label>
@@ -219,7 +259,7 @@
 
                 <div class="control">
                     <label>Timezone (UTC offset)</label>
-                    <input id="tz" type="number" value="3" />
+                    <input id="tz" type="number" value="3">
                 </div>
 
                 <div class="control">
@@ -233,20 +273,11 @@
                     </select>
                 </div>
 
-
                 <div class="control">
-                    <label>Preview size</label>
-                    <select id="previewSize">
-                        <option value="fit">Fit</option>
-                        <option value="readable" selected>Readable</option>
-                    </select>
-                </div>
-
-                <div class="control">
-                    <label>Always-On Display</label>
-                    <select id="aod">
+                    <label>Show iOS safe zones</label>
+                    <select id="safeZones">
+                        <option value="on" selected>On</option>
                         <option value="off">Off</option>
-                        <option value="on">On</option>
                     </select>
                 </div>
 
@@ -256,54 +287,50 @@
             <button class="copy" id="copy">Copy link</button>
 
             <div class="hint">
-                AOD preview simulates iOS Always-On Display.
-                Wallpaper image itself is unchanged.
+                Safe zones are preview-only and not included in the wallpaper image.
             </div>
         </div>
-
     </div>
 </div>
 
 <script>
     const preview = document.getElementById("preview");
     const urlBox = document.getElementById("url");
+    const device = document.getElementById("device");
     const lang = document.getElementById("lang");
     const tz = document.getElementById("tz");
-    const viewport = document.getElementById("viewport");
-    const previewSize = document.getElementById("previewSize");
-    const screen = document.getElementById("screen");
-    const aod = document.getElementById("aod");
-    const copy = document.getElementById("copy");
     const weekends = document.getElementById("weekends");
+    const safeZones = document.getElementById("safeZones");
+    const zones = document.querySelectorAll(".ios-safe");
 
     function buildURL() {
-        return `/wallpaper?mode=months&lang=${lang.value}&timezone=${tz.value}&weekends=${weekends.value}`;
+        return `/wallpaper?mode=months`
+            + `&device=${device.value}`
+            + `&lang=${lang.value}`
+            + `&timezone=${tz.value}`
+            + `&weekends=${weekends.value}`;
     }
-
-
-    weekends.onchange = update;
-
 
     function update() {
-        const u = buildURL();
-        preview.src = u;
-        urlBox.textContent = location.origin + u;
+        const url = buildURL();
+        preview.src = url;
+        urlBox.textContent = location.origin + url;
     }
 
-    previewSize.onchange = () =>
-        viewport.className = `preview-viewport ${previewSize.value}`;
-
-    aod.onchange = () =>
-        screen.classList.toggle("aod", aod.value === "on");
-
-    copy.onclick = () => {
-        navigator.clipboard.writeText(urlBox.textContent);
-        copy.textContent = "Copied ✓";
-        setTimeout(() => copy.textContent = "Copy link", 1200);
-    };
-
+    device.onchange = update;
     lang.onchange = update;
     tz.oninput = update;
+    weekends.onchange = update;
+
+    safeZones.onchange = () => {
+        zones.forEach(z =>
+            z.style.display = safeZones.value === "on" ? "flex" : "none"
+        );
+    };
+
+    document.getElementById("copy").onclick = () => {
+        navigator.clipboard.writeText(urlBox.textContent);
+    };
 
     update();
 </script>
