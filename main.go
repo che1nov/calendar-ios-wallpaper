@@ -25,7 +25,12 @@ func main() {
 		loc := time.FixedZone("user", tz*3600)
 		now := time.Now().In(loc)
 
-		img := RenderCalendar(now, IOSTheme(), "months", lang)
+		weekends := q.Get("weekends")
+		if weekends == "" {
+			weekends = "off"
+		}
+
+		img := RenderCalendar(now, IOSTheme(), "months", lang, weekends)
 
 		w.Header().Set("Content-Type", "image/png")
 		_ = png.Encode(w, img)

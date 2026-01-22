@@ -223,11 +223,22 @@
                 </div>
 
                 <div class="control">
+                    <label>Highlight weekends</label>
+                    <select id="weekends">
+                        <option value="off">Off</option>
+                        <option value="gray">Gray</option>
+                        <option value="green">Green</option>
+                        <option value="blue">Blue</option>
+                        <option value="red">Red</option>
+                    </select>
+                </div>
+
+
+                <div class="control">
                     <label>Preview size</label>
                     <select id="previewSize">
                         <option value="fit">Fit</option>
                         <option value="readable" selected>Readable</option>
-                        <option value="full">1:1</option>
                     </select>
                 </div>
 
@@ -263,10 +274,15 @@
     const screen = document.getElementById("screen");
     const aod = document.getElementById("aod");
     const copy = document.getElementById("copy");
+    const weekends = document.getElementById("weekends");
 
     function buildURL() {
-        return `/wallpaper?mode=months&theme=ios&lang=${lang.value}&timezone=${tz.value}`;
+        return `/wallpaper?mode=months&lang=${lang.value}&timezone=${tz.value}&weekends=${weekends.value}`;
     }
+
+
+    weekends.onchange = update;
+
 
     function update() {
         const u = buildURL();

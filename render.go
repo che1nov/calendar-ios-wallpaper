@@ -28,34 +28,55 @@ func init() {
 	footerFace, _ = opentype.NewFace(f, &opentype.FaceOptions{Size: 34, DPI: 72})
 }
 
-func RenderCalendar(now time.Time, theme Theme, mode, lang string) *image.RGBA {
+func RenderCalendar(
+	now time.Time,
+	theme Theme,
+	mode, lang, weekends string,
+) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, Width, Height))
 	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
 
 	_, left, percent := Progress(now)
 
 	months := BuildMonths(now, lang)
-	drawMonths(img, months, theme)
+	drawMonths(img, months, theme, weekends)
 
 	drawText(img, fmt.Sprintf("%d d left   %d%%", left, percent), Width/2, Height-180, theme.Text, footerFace)
 	return img
 }
 
-func drawMonths(img *image.RGBA, months []MonthData, theme Theme) {
-	cellW := Width / 3
-	cellH := (Height - 500) / 4
-	offsetY := 320
+func drawMonths(
+	img *image.RGBA,
+	months []MonthData,
+	theme Theme,
+	weekends string,
+) {
+	const cols, rows = 3, 4
+
+	topSafe, bottomSafe := calcSafeAreas(Height)
+	usableHeight := Height - topSafe - bottomSafe
+
+	cellW := Width / cols
+	cellH := usableHeight / rows
 
 	for i, m := range months {
-		c := i % 3
-		r := i / 3
-		cx := c*cellW + cellW/2
-		cy := offsetY + r*cellH + cellH/2
-		drawMonth(img, cx, cy, m, theme)
+		col := i % cols
+		row := i / cols
+
+		cx := col*cellW + cellW/2
+		cy := topSafe + row*cellH + cellH/2
+
+		drawMonth(img, cx, cy, m, theme, weekends)
 	}
 }
 
-func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
+func drawMonth(
+	img *image.RGBA,
+	cx, cy int,
+	m MonthData,
+	theme Theme,
+	weekends string,
+) {
 	drawText(img, m.Name, cx, cy-80, theme.Text, monthFace)
 
 	spacing := 32
@@ -65,18 +86,44 @@ func drawMonth(img *image.RGBA, cx, cy int, m MonthData, theme Theme) {
 
 	for d := 0; d < m.Days; d++ {
 		i := m.StartWeekday + d
-		x := startX + (i%7)*spacing
-		y := startY + (i/7)*spacing
+		colIndex := i % 7
+		row := i / 7
 
-		col := theme.Future
+		x := startX + colIndex*spacing
+		y := startY + row*spacing
+
+		dot := theme.Future
+
+		isWeekend := colIndex == 5 || colIndex == 6
+
+		if isWeekend {
+			switch weekends {
+			case "gray":
+				dot = theme.WeekendGray
+			case "green":
+				dot = theme.WeekendGreen
+			case "blue":
+				dot = theme.WeekendBlue
+			case "red":
+				dot = theme.WeekendRed
+			case "off":
+				// ничего
+			}
+		}
+
+		// прошедшие дни
 		if d < m.PassedDays {
-			col = theme.Active
+			dot = theme.Active
 		}
+
+		// сегодня — приоритет
 		if m.IsCurrent && d == m.PassedDays-1 {
-			col = theme.Today
+			dot = theme.Today
 		}
-		drawCircle(img, x, y, radius, col)
+
+		drawCircle(img, x, y, radius, dot)
 	}
+
 }
 
 func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
@@ -94,4 +141,10 @@ func drawCircle(img *image.RGBA, cx, cy, r int, col color.Color) {
 			}
 		}
 	}
+}
+
+func calcSafeAreas(height int) (top, bottom int) {
+	top = int(float64(height) * 0.22)    // зона часов / Dynamic Island
+	bottom = int(float64(height) * 0.16) // зона кнопок
+	return
 }
