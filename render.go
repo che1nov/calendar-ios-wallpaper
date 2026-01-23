@@ -96,7 +96,7 @@ func RenderCalendar(
 		scale,
 	)
 
-	footerY := device.ButtonsTop() - int(1*scale)
+	footerY := device.ButtonsTop() + int(80*scale)
 	drawFooterAtY(img, now, device, theme, lang, footerY)
 
 	return img
