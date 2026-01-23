@@ -325,6 +325,28 @@
 
 
                 <div class="control">
+                    <label>Background</label>
+                    <select id="bg">
+                        <option value="ios" selected>iOS Premium</option>
+                        <option value="gradient">Gradient</option>
+                        <option value="noise">Noise</option>
+                        <option value="plain">Plain Black</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Background color</label>
+                    <select id="bgColor">
+                        <option value="black" selected>Black</option>
+                        <option value="blue">Blue</option>
+                        <option value="purple">Purple</option>
+                        <option value="green">Green</option>
+                        <option value="red">Red</option>
+                    </select>
+                </div>
+
+
+                <div class="control">
                     <label>Highlight weekends</label>
                     <select id="weekends">
                         <option value="off">Off</option>
@@ -368,6 +390,8 @@
     const dayStyle = document.getElementById("dayStyle");
     const size = document.getElementById("size");
     const sizeValue = document.getElementById("sizeValue");
+    const bg = document.getElementById("bg");
+    const bgColor = document.getElementById("bgColor");
 
     function buildURL() {
         return `/wallpaper?mode=months`
@@ -376,7 +400,9 @@
             + `&timezone=${tz.value}`
             + `&weekends=${weekends.value}`
             + `&style=${dayStyle.value}`
-            + `&size=${size.value}`;
+            + `&size=${size.value}`
+            + `&bg=${bg.value}`
+            + `&color=${bgColor.value}`;
     }
 
 
@@ -392,6 +418,9 @@
     tz.oninput=update;
     weekends.onchange=update;
     dayStyle.onchange = update;
+    bg.onchange = update;
+    bgColor.onchange = update;
+
 
 
     safeZones.onchange=()=>{

@@ -42,6 +42,11 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 	styleParam := q.Get("style")
 	dayStyle := DayDots // default
 
+	bg := BackgroundStyle(q.Get("bg"))
+	if bg == "" {
+		bg = BgIOS
+	}
+
 	switch styleParam {
 	case "bars":
 		dayStyle = DayBars
@@ -55,7 +60,6 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 	now := time.Now().In(loc)
 
 	//6. Size
-
 	sizeParam := q.Get("size")
 	uiScale := 1.0
 
@@ -65,7 +69,17 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// 6. Render
+	bgStyle := BackgroundStyle(q.Get("bg"))
+	if bgStyle == "" {
+		bgStyle = BgIOS
+	}
+
+	bgColor := BackgroundColor(q.Get("color"))
+	if bgColor == "" {
+		bgColor = BgBlack
+	}
+
+	// 7. Render
 	img := RenderCalendar(
 		now,
 		device,
@@ -75,6 +89,8 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		weekends,
 		dayStyle,
 		uiScale,
+		bgStyle,
+		bgColor,
 	)
 
 	w.Header().Set("Content-Type", "image/png")

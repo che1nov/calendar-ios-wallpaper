@@ -56,6 +56,8 @@ func RenderCalendar(
 	weekends string,
 	dayStyle DayStyle,
 	uiScale float64,
+	bgStyle BackgroundStyle,
+	bgColor BackgroundColor,
 ) *image.RGBA {
 
 	deviceScale := device.Scale()
@@ -64,7 +66,7 @@ func RenderCalendar(
 	initFonts(scale)
 
 	img := image.NewRGBA(image.Rect(0, 0, device.Width, device.Height))
-	drawPremiumBackground(img, device)
+	drawBackground(img, device, bgStyle, bgColor)
 
 	if mode != "months" {
 		return img
@@ -81,8 +83,6 @@ func RenderCalendar(
 	gridTop := safeTop
 	gridBottom := safeBottom - footerHeight - footerGap
 	gridHeight := gridBottom - gridTop
-
-	drawCalendarPanel(img, gridTop, gridBottom)
 
 	drawMonths(
 		img,
