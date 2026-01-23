@@ -84,26 +84,6 @@ var (
 var Devices = map[string]DeviceProfile{
 
 	// ===== Classic (Home Button) =====
-	"iphone-4": {
-		Key: "iphone-4", Name: "iPhone 4 / 4S",
-		Width: 640, Height: 960,
-		ClockZoneRatio: 0.24, ButtonsZoneRatio: 0.85,
-	},
-	"iphone-5": {
-		Key: "iphone-5", Name: "iPhone 5 / 5C / 5S",
-		Width: 640, Height: 1136,
-		ClockZoneRatio: 0.25, ButtonsZoneRatio: 0.84,
-	},
-	"iphone-6": {
-		Key: "iphone-6", Name: "iPhone 6 / 6s / 7 / 8",
-		Width: 750, Height: 1334,
-		ClockZoneRatio: 0.26, ButtonsZoneRatio: 0.84,
-	},
-	"iphone-6-plus": {
-		Key: "iphone-6-plus", Name: "iPhone 6 Plus / 7 Plus / 8 Plus",
-		Width: 1080, Height: 1920,
-		ClockZoneRatio: 0.27, ButtonsZoneRatio: 0.83,
-	},
 	"iphone-se-1": {
 		Key: "iphone-se-1", Name: "iPhone SE (1st gen)",
 		Width: 640, Height: 1136,
