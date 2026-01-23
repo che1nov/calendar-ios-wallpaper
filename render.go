@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"image/draw"
 	"time"
 
 	"golang.org/x/image/font"
@@ -65,7 +64,7 @@ func RenderCalendar(
 	initFonts(scale)
 
 	img := image.NewRGBA(image.Rect(0, 0, device.Width, device.Height))
-	draw.Draw(img, img.Bounds(), &image.Uniform{theme.Background}, image.Point{}, draw.Src)
+	drawBackground(img)
 
 	if mode != "months" {
 		return img
