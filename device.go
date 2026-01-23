@@ -27,6 +27,10 @@ func (d DeviceProfile) ButtonsTop() int {
 	return int(float64(d.Height) * d.ButtonsZoneRatio)
 }
 
+func (d DeviceProfile) Scale() float64 {
+	return float64(d.Width) / float64(BaseWidth)
+}
+
 // =======================
 // БАЗОВЫЕ ПРОФИЛИ (ШАБЛОНЫ)
 // =======================
