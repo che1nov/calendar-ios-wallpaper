@@ -255,6 +255,16 @@
                 </div>
 
                 <div class="control">
+                    <label>Day style</label>
+                    <select id="dayStyle">
+                        <option value="dots" selected>Dots</option>
+                        <option value="bars">Bars</option>
+                        <option value="numbers">Numbers</option>
+                    </select>
+                </div>
+
+
+                <div class="control">
                     <label>Highlight weekends</label>
                     <select id="weekends">
                         <option value="off">Off</option>
@@ -295,13 +305,16 @@
     const weekends=document.getElementById("weekends");
     const safeZones=document.getElementById("safeZones");
     const zones=document.querySelectorAll(".ios-safe");
+    const dayStyle = document.getElementById("dayStyle");
 
-    function buildURL(){
+
+    function buildURL() {
         return `/wallpaper?mode=months`
             + `&device=${device.value}`
             + `&lang=${lang.value}`
             + `&timezone=${tz.value}`
-            + `&weekends=${weekends.value}`;
+            + `&weekends=${weekends.value}`
+            + `&style=${dayStyle.value}`;
     }
 
     function update(){
@@ -314,6 +327,8 @@
     lang.onchange=update;
     tz.oninput=update;
     weekends.onchange=update;
+    dayStyle.onchange = update;
+
 
     safeZones.onchange=()=>{
         zones.forEach(z=>z.style.display=

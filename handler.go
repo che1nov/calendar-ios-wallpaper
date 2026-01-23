@@ -38,12 +38,23 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		weekends = "off"
 	}
 
-	// 4. Timezone
+	// 4. Day style (НОВОЕ)
+	styleParam := q.Get("style")
+	dayStyle := DayDots // default
+
+	switch styleParam {
+	case "bars":
+		dayStyle = DayBars
+	case "numbers":
+		dayStyle = DayNumbers
+	}
+
+	// 5. Timezone
 	tz, _ := strconv.Atoi(q.Get("timezone"))
 	loc := time.FixedZone("user", tz*3600)
 	now := time.Now().In(loc)
 
-	// 5. Render
+	// 6. Render
 	img := RenderCalendar(
 		now,
 		device,
@@ -51,6 +62,7 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		"months",
 		lang,
 		weekends,
+		dayStyle,
 	)
 
 	w.Header().Set("Content-Type", "image/png")
