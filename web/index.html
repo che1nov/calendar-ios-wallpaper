@@ -285,9 +285,6 @@
                     </select>
                 </div>
 
-
-
-
                 <div class="control">
                     <label>Language</label>
                     <select id="lang">
@@ -299,6 +296,22 @@
                 <div class="control">
                     <label>Timezone (UTC offset)</label>
                     <input id="tz" type="number" value="3">
+                </div>
+
+                <div class="control">
+                    <label for="size">
+                        Size
+                        <span id="sizeValue" style="opacity:.6;margin-left:6px">100%</span>
+                    </label>
+
+                    <input
+                            id="size"
+                            type="range"
+                            min="80"
+                            max="130"
+                            step="5"
+                            value="100"
+                    />
                 </div>
 
                 <div class="control">
@@ -353,7 +366,8 @@
     const safeZones=document.getElementById("safeZones");
     const zones=document.querySelectorAll(".ios-safe");
     const dayStyle = document.getElementById("dayStyle");
-
+    const size = document.getElementById("size");
+    const sizeValue = document.getElementById("sizeValue");
 
     function buildURL() {
         return `/wallpaper?mode=months`
@@ -361,8 +375,11 @@
             + `&lang=${lang.value}`
             + `&timezone=${tz.value}`
             + `&weekends=${weekends.value}`
-            + `&style=${dayStyle.value}`;
+            + `&style=${dayStyle.value}`
+            + `&size=${size.value}`;
     }
+
+
 
     function update(){
         const url=buildURL();
@@ -385,6 +402,13 @@
     document.getElementById("copy").onclick=()=>{
         navigator.clipboard.writeText(urlBox.textContent);
     };
+
+    size.oninput = () => {
+        sizeValue.textContent = size.value + "%";
+        update();
+    };
+
+    sizeValue.textContent = size.value + "%";
 
     update();
 </script>

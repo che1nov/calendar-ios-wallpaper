@@ -54,6 +54,17 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 	loc := time.FixedZone("user", tz*3600)
 	now := time.Now().In(loc)
 
+	//6. Size
+
+	sizeParam := q.Get("size")
+	uiScale := 1.0
+
+	if sizeParam != "" {
+		if v, err := strconv.Atoi(sizeParam); err == nil {
+			uiScale = float64(v) / 100.0
+		}
+	}
+
 	// 6. Render
 	img := RenderCalendar(
 		now,
@@ -63,6 +74,7 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		lang,
 		weekends,
 		dayStyle,
+		uiScale,
 	)
 
 	w.Header().Set("Content-Type", "image/png")

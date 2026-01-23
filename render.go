@@ -11,9 +11,9 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-// ===============================
-// BASE (iPhone 15 / 15 Pro)
-// ===============================
+/*
+BASE — дизайн под iPhone 15 / 15 Pro
+*/
 
 const (
 	BaseWidth  = 1179
@@ -27,20 +27,27 @@ const (
 	BaseSpacing   = 32
 )
 
-// ===============================
-// FONTS (scaled per device)
-// ===============================
+/*
+DESIGN TUNING
+*/
+const (
+	MonthTitleScale = 1.25 // названия месяцев
+	DayGridScale    = 1.05 // точки / бары / числа
+	FooterScale     = 0.90 // нижний текст
+)
 
+/*
+FONTS
+*/
 var (
 	monthFace  font.Face
 	footerFace font.Face
 	numberFace font.Face
 )
 
-// ===============================
-// MAIN ENTRY
-// ===============================
-
+/*
+MAIN ENTRY
+*/
 func RenderCalendar(
 	now time.Time,
 	device DeviceProfile,
@@ -49,9 +56,11 @@ func RenderCalendar(
 	lang string,
 	weekends string,
 	dayStyle DayStyle,
+	uiScale float64,
 ) *image.RGBA {
 
-	scale := device.Scale()
+	deviceScale := device.Scale()
+	scale := deviceScale * uiScale
 
 	initFonts(scale)
 
@@ -67,9 +76,8 @@ func RenderCalendar(
 	safeTop := device.ClockBottom()
 	safeBottom := device.ButtonsTop()
 
-	// ===== FOOTER METRICS =====
-	footerHeight := int(48 * scale)
-	footerGap := int(32 * scale)
+	footerHeight := int(52 * scale)
+	footerGap := int(28 * scale)
 
 	gridTop := safeTop
 	gridBottom := safeBottom - footerHeight - footerGap
@@ -84,31 +92,30 @@ func RenderCalendar(
 		theme,
 		weekends,
 		dayStyle,
+		scale,
 	)
 
-	footerY := device.Height - int(72*scale)
+	footerY := device.ButtonsTop() - int(1*scale)
 	drawFooterAtY(img, now, device, theme, lang, footerY)
 
 	return img
 }
 
-// ===============================
-// FONTS INIT
-// ===============================
-
+/*
+FONTS INIT
+*/
 func initFonts(scale float64) {
 	fontBytes := mustRead("fonts/Inter-Regular.ttf")
 	f := mustParseFont(fontBytes)
 
-	monthFace = mustFace(f, BaseMonthFont*scale)
-	footerFace = mustFace(f, BaseFooterFont*scale)
-	numberFace = mustFace(f, BaseNumberFont*scale)
+	monthFace = mustFace(f, BaseMonthFont*scale*MonthTitleScale)
+	footerFace = mustFace(f, BaseFooterFont*scale*FooterScale)
+	numberFace = mustFace(f, BaseNumberFont*scale*DayGridScale)
 }
 
-// ===============================
-// MONTH GRID
-// ===============================
-
+/*
+MONTH GRID
+*/
 func drawMonths(
 	img *image.RGBA,
 	months []MonthData,
@@ -118,6 +125,7 @@ func drawMonths(
 	theme Theme,
 	weekends string,
 	dayStyle DayStyle,
+	scale float64,
 ) {
 	const cols = 3
 	const rows = 4
@@ -132,27 +140,34 @@ func drawMonths(
 		cx := c*cellW + cellW/2
 		cy := offsetY + r*cellH + cellH/2
 
-		drawMonth(img, cx, cy, m, device, theme, weekends, dayStyle, cellW)
+		drawMonth(
+			img,
+			cx,
+			cy,
+			m,
+			theme,
+			weekends,
+			dayStyle,
+			cellW,
+			scale,
+		)
 	}
 }
 
-// ===============================
-// SINGLE MONTH
-// ===============================
-
+/*
+SINGLE MONTH
+*/
 func drawMonth(
 	img *image.RGBA,
 	cx, cy int,
 	m MonthData,
-	device DeviceProfile,
 	theme Theme,
 	weekends string,
 	style DayStyle,
 	cellW int,
+	scale float64,
 ) {
-	scale := device.Scale()
-
-	titleOffset := int(40 * scale)
+	titleOffset := int(52 * scale)
 
 	titleColor := theme.Text
 	if m.IsCurrent {
@@ -163,32 +178,30 @@ func drawMonth(
 
 	switch style {
 	case DayDots:
-		drawMonthDots(img, cx, cy, m, device, theme, weekends, cellW)
+		drawMonthDots(img, cx, cy, m, theme, weekends, scale)
 	case DayBars:
-		drawMonthBars(img, cx, cy, m, device, theme, weekends, cellW)
+		drawMonthBars(img, cx, cy, m, theme, weekends, scale)
 	case DayNumbers:
-		drawMonthNumbers(img, cx, cy, m, device, theme, weekends, cellW)
+		drawMonthNumbers(img, cx, cy, m, theme, weekends, scale)
 	}
 }
 
-// ===============================
-// DAY STYLES
-// ===============================
-
+/*
+DAY STYLES
+*/
 func drawMonthDots(
 	img *image.RGBA,
 	cx, cy int,
 	m MonthData,
-	device DeviceProfile,
 	theme Theme,
 	weekends string,
-	cellW int,
+	scale float64,
 ) {
-	scale := device.Scale()
+	gridScale := scale * DayGridScale
 
 	cols := 7
-	spacing := int(BaseSpacing * scale)
-	radius := int(BaseDotRadius * scale)
+	spacing := int(BaseSpacing * gridScale)
+	radius := int(BaseDotRadius * gridScale)
 
 	startX := cx - (cols-1)*spacing/2
 	startY := cy
@@ -200,8 +213,7 @@ func drawMonthDots(
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		color := resolveDayColor(day, col, m, theme, weekends)
-		drawCircle(img, x, y, radius, color)
+		drawCircle(img, x, y, radius, resolveDayColor(day, col, m, theme, weekends))
 	}
 }
 
@@ -209,18 +221,17 @@ func drawMonthBars(
 	img *image.RGBA,
 	cx, cy int,
 	m MonthData,
-	device DeviceProfile,
 	theme Theme,
 	weekends string,
-	cellW int,
+	scale float64,
 ) {
-	scale := device.Scale()
+	gridScale := scale * DayGridScale
 
 	cols := 7
-	spacing := int(BaseSpacing * scale)
+	spacing := int(BaseSpacing * gridScale)
 
-	barW := int(16 * scale)
-	barH := int(6 * scale)
+	barW := int(20 * gridScale)
+	barH := int(6 * gridScale)
 
 	startX := cx - (cols-1)*spacing/2
 	startY := cy
@@ -232,8 +243,8 @@ func drawMonthBars(
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		color := resolveDayColor(day, col, m, theme, weekends)
-		drawRect(img, x-barW/2, y-barH/2, barW, barH, color)
+		drawRect(img, x-barW/2, y-barH/2, barW, barH,
+			resolveDayColor(day, col, m, theme, weekends))
 	}
 }
 
@@ -241,15 +252,14 @@ func drawMonthNumbers(
 	img *image.RGBA,
 	cx, cy int,
 	m MonthData,
-	device DeviceProfile,
 	theme Theme,
 	weekends string,
-	cellW int,
+	scale float64,
 ) {
-	scale := device.Scale()
+	gridScale := scale * DayGridScale
 
 	cols := 7
-	spacing := int(30 * scale)
+	spacing := int(30 * gridScale)
 
 	startX := cx - (cols-1)*spacing/2
 	startY := cy
@@ -261,23 +271,20 @@ func drawMonthNumbers(
 		x := startX + col*spacing
 		y := startY + row*spacing
 
-		color := resolveDayColor(day, col, m, theme, weekends)
-
 		drawText(
 			img,
 			fmt.Sprintf("%d", day+1),
 			x,
 			y,
-			color,
+			resolveDayColor(day, col, m, theme, weekends),
 			numberFace,
 		)
 	}
 }
 
-// ===============================
-// FOOTER
-// ===============================
-
+/*
+FOOTER
+*/
 func drawFooterAtY(
 	img *image.RGBA,
 	now time.Time,
@@ -291,35 +298,32 @@ func drawFooterAtY(
 	left := total - day
 	percent := int(float64(day) / float64(total) * 100)
 
-	text := footerText(left, percent, lang)
-
-	drawText(img, text, device.Width/2, y, theme.Text, footerFace)
+	drawText(
+		img,
+		footerText(left, percent, lang),
+		device.Width/2,
+		y,
+		theme.Text,
+		footerFace,
+	)
 }
 
 func footerText(left, percent int, lang string) string {
 	if lang == "ru" {
-		return fixedText("%d дн. осталось   %d%%", left, percent)
+		return fmt.Sprintf("%d дн. осталось   %d%%", left, percent)
 	}
-	return fixedText("%d d left   %d%%", left, percent)
+	return fmt.Sprintf("%d d left   %d%%", left, percent)
 }
 
-// ===============================
-// HELPERS
-// ===============================
-
-func drawText(
-	img *image.RGBA,
-	text string,
-	cx, y int,
-	col color.Color,
-	face font.Face,
-) {
+/*
+DRAW HELPERS
+*/
+func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
 	d := &font.Drawer{
 		Dst:  img,
 		Src:  image.NewUniform(col),
 		Face: face,
 	}
-
 	w := d.MeasureString(text).Round()
 	d.Dot = fixed.P(cx-w/2, y)
 	d.DrawString(text)
@@ -343,25 +347,13 @@ func drawRect(img *image.RGBA, x, y, w, h int, col color.Color) {
 	}
 }
 
-func resolveDayColor(
-	day int,
-	col int,
-	m MonthData,
-	theme Theme,
-	weekends string,
-) color.Color {
-
-	// Сегодня — абсолютный приоритет
+func resolveDayColor(day, col int, m MonthData, theme Theme, weekends string) color.Color {
 	if m.IsCurrent && day == m.PassedDays-1 {
 		return theme.Today
 	}
-
-	// Прошедшие дни
 	if day < m.PassedDays {
 		return theme.Active
 	}
-
-	// Выходные
 	if weekends != "off" && (col == 5 || col == 6) {
 		switch weekends {
 		case "gray":
@@ -374,7 +366,5 @@ func resolveDayColor(
 			return theme.WeekendRed
 		}
 	}
-
-	// Будущие дни
 	return theme.Future
 }
