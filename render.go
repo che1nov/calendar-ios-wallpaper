@@ -31,9 +31,9 @@ const (
 DESIGN TUNING
 */
 const (
-	MonthTitleScale = 1.25 // названия месяцев
-	DayGridScale    = 1.05 // точки / бары / числа
-	FooterScale     = 0.90 // нижний текст
+	MonthTitleScale = 1.00 // названия месяцев
+	DayGridScale    = 1.00 // точки / бары / числа
+	FooterScale     = 1.00 // нижний текст
 )
 
 /*
@@ -105,7 +105,7 @@ func RenderCalendar(
 FONTS INIT
 */
 func initFonts(scale float64) {
-	fontBytes := mustRead("fonts/Inter-Regular.ttf")
+	fontBytes := mustRead("fonts/SFPRODISPLAYBOLD.OTF")
 	f := mustParseFont(fontBytes)
 
 	monthFace = mustFace(f, BaseMonthFont*scale*MonthTitleScale)
