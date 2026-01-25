@@ -358,7 +358,7 @@ func resolveDayColor(day, col int, m MonthData, theme Theme, weekends string) co
 	if weekends != "off" && (col == 5 || col == 6) {
 		switch weekends {
 		case "gray":
-			return theme.Future
+			return theme.WeekendGray
 		case "green":
 			return theme.WeekendGreen
 		case "blue":
