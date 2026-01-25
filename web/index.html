@@ -598,15 +598,13 @@
             + `&style=${dayStyle.value}`
             + `&size=${size.value}`
             + `&bg=${bg.value}`
-            + `&color=${bgColor.value}`;
+            + `&color=${encodeURIComponent(bgColor.value)}`;
     }
 
-
-
     function update(){
-        const url=buildURL();
-        preview.src=url;
-        urlBox.textContent=location.origin+url;
+        const url = buildURL() + "&_=" + Date.now(); // анти-кеш
+        preview.src = url;
+        urlBox.textContent = location.origin + url;
     }
 
     device.onchange=update;
@@ -615,7 +613,7 @@
     weekends.onchange=update;
     dayStyle.onchange = update;
     bg.onchange = update;
-    bgColor.onchange = update;
+    bgColor.oninput = update;
 
 
 
@@ -704,6 +702,7 @@
 
         localStorage.setItem("uiLang", lang);
     }
+
 
 
     const uiLangSelect = document.getElementById("uiLang");

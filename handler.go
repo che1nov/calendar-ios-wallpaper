@@ -81,9 +81,9 @@ func wallpaperHandler(w http.ResponseWriter, r *http.Request) {
 		bgStyle = BgIOS
 	}
 
-	bgColor := BackgroundColor(q.Get("color"))
+	bgColor := q.Get("color")
 	if bgColor == "" {
-		bgColor = BgBlack
+		bgColor = "black"
 	}
 
 	// 7. Render

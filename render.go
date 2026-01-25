@@ -57,7 +57,7 @@ func RenderCalendar(
 	dayStyle DayStyle,
 	uiScale float64,
 	bgStyle BackgroundStyle,
-	bgColor BackgroundColor,
+	bgColor string,
 ) *image.RGBA {
 
 	deviceScale := device.Scale()

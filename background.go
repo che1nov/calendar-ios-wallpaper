@@ -5,41 +5,22 @@ import (
 	"image/color"
 	"math"
 	"math/rand"
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 )
 
 type BackgroundStyle string
-type BackgroundColor string
 
 const (
 	BgPlain    BackgroundStyle = "plain"
 	BgGradient BackgroundStyle = "gradient"
 	BgNoise    BackgroundStyle = "noise"
 	BgIOS      BackgroundStyle = "ios"
-
-	BgBlack  BackgroundColor = "black"
-	BgBlue   BackgroundColor = "blue"
-	BgPurple BackgroundColor = "purple"
-	BgGreen  BackgroundColor = "green"
-	BgRed    BackgroundColor = "red"
 )
 
-func backgroundBaseColor(c BackgroundColor) color.RGBA {
-	switch c {
-	case BgBlue:
-		return color.RGBA{10, 20, 40, 255}
-	case BgPurple:
-		return color.RGBA{25, 10, 40, 255}
-	case BgGreen:
-		return color.RGBA{10, 40, 20, 255}
-	case BgRed:
-		return color.RGBA{40, 10, 10, 255}
-	default:
-		return color.RGBA{0, 0, 0, 255}
-	}
-}
-
-func drawBackground(img *image.RGBA, device DeviceProfile, style BackgroundStyle, bgColor BackgroundColor) {
+func drawBackground(img *image.RGBA, device DeviceProfile, style BackgroundStyle, bgColor string) {
 	base := backgroundBaseColor(bgColor)
 
 	switch style {
@@ -54,6 +35,58 @@ func drawBackground(img *image.RGBA, device DeviceProfile, style BackgroundStyle
 	default:
 		drawPremiumBackgroundWithBase(img, device, base)
 	}
+}
+
+/* =========================
+   COLOR PARSING
+========================= */
+
+func backgroundBaseColor(c string) color.RGBA {
+	if c == "" {
+		return color.RGBA{0, 0, 0, 255}
+	}
+
+	// декодируем %23
+	if decoded, err := url.QueryUnescape(c); err == nil {
+		c = decoded
+	}
+
+	c = strings.ToLower(strings.TrimSpace(c))
+
+	// HEX
+	if strings.HasPrefix(c, "#") {
+		return parseHexColor(c)
+	}
+
+	// Presets
+	switch c {
+	case "blue":
+		return color.RGBA{10, 20, 40, 255}
+	case "purple":
+		return color.RGBA{25, 10, 40, 255}
+	case "green":
+		return color.RGBA{10, 40, 20, 255}
+	case "red":
+		return color.RGBA{40, 10, 10, 255}
+	case "black":
+		fallthrough
+	default:
+		return color.RGBA{0, 0, 0, 255}
+	}
+}
+
+func parseHexColor(s string) color.RGBA {
+	s = strings.TrimPrefix(s, "#")
+
+	if len(s) != 6 {
+		return color.RGBA{0, 0, 0, 255}
+	}
+
+	r, _ := strconv.ParseUint(s[0:2], 16, 8)
+	g, _ := strconv.ParseUint(s[2:4], 16, 8)
+	b, _ := strconv.ParseUint(s[4:6], 16, 8)
+
+	return color.RGBA{uint8(r), uint8(g), uint8(b), 255}
 }
 
 /* =========================
@@ -127,30 +160,6 @@ func drawPremiumBackgroundWithBase(img *image.RGBA, device DeviceProfile, base c
 
 		for x := 0; x < w; x++ {
 			img.Set(x, y, color.RGBA{r, g, b, 255})
-		}
-	}
-
-	clockBottom := device.ClockBottom()
-	cx := float64(w) / 2
-	cy := float64(clockBottom) / 2
-	radius := float64(w) * 0.6
-
-	for y := 0; y < clockBottom; y++ {
-		for x := 0; x < w; x++ {
-			dx := float64(x) - cx
-			dy := float64(y) - cy
-			d := math.Sqrt(dx*dx + dy*dy)
-
-			if d < radius {
-				k := 1 - d/radius
-				c := img.RGBAAt(x, y)
-				img.Set(x, y, color.RGBA{
-					uint8(min(float64(c.R)+k*18, 255)),
-					uint8(min(float64(c.G)+k*18, 255)),
-					uint8(min(float64(c.B)+k*18, 255)),
-					255,
-				})
-			}
 		}
 	}
 
