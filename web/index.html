@@ -255,7 +255,24 @@
             box-shadow: 0 10px 30px rgba(0,0,0,.6);
         }
 
+        .ui-lang-switch {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 999;
+        }
 
+        .ui-lang-switch select {
+            background:#1c1c1e;
+            color:#fff;
+            border:1px solid var(--border);
+            border-radius:10px;
+            padding:6px 10px;
+            font-size:13px;
+        }
+
+        .instructions-lang { display:none; }
+        .instructions-lang.active { display:block; }
 
     </style>
 </head>
@@ -263,8 +280,16 @@
 <body>
 <div class="container">
 
-    <h1>Calendar Wallpaper</h1>
-    <div class="subtitle">Minimal iOS lock screen calendar wallpaper</div>
+    <div class="ui-lang-switch">
+        <select id="uiLang">
+            <option value="ru">RU</option>
+            <option value="en">EN</option>
+        </select>
+    </div>
+
+
+    <h1 data-i18n="title"></h1>
+    <div class="subtitle" data-i18n="subtitle"></div>
 
     <div class="tabs">
         <button class="tab active" data-tab="generator">Generator</button>
@@ -294,7 +319,7 @@
             <div class="controls">
 
                 <div class="control">
-                    <label for="device">iPhone model</label>
+                    <label data-i18n="labelDevice">iPhone model</label>
                     <select id="device">
 
                         <optgroup label="Classic (Home Button)">
@@ -356,7 +381,7 @@
                 </div>
 
                 <div class="control">
-                    <label>Language</label>
+                    <label data-i18n="labelLang">Language</label>
                     <select id="lang">
                         <option value="en">English</option>
                         <option value="ru">Русский</option>
@@ -364,7 +389,7 @@
                 </div>
 
                 <div class="control">
-                    <label for="tz">Time zone</label>
+                    <label data-i18n="labelTZ">Time zone</label>
                     <select id="tz">
                         <option value="-12">UTC −12</option>
                         <option value="-11">UTC −11</option>
@@ -397,9 +422,8 @@
                 </div>
 
                 <div class="control">
-                    <label for="size">
-                        Size
-                        <span id="sizeValue" style="opacity:.6;margin-left:6px">100%</span>
+                    <label data-i18n="labelSize">Size</label>
+                    Size <span id="sizeValue" style="opacity:.6;margin-left:6px">100%</span>
                     </label>
 
                     <input
@@ -413,7 +437,7 @@
                 </div>
 
                 <div class="control">
-                    <label>Day style</label>
+                    <label data-i18n="labelDayStyle">Day style</label>
                     <select id="dayStyle">
                         <option value="dots" selected>Dots</option>
                         <option value="bars">Bars</option>
@@ -423,7 +447,7 @@
 
 
                 <div class="control">
-                    <label>Background</label>
+                    <label data-i18n="labelBg">Background</label>
                     <select id="bg">
                         <option value="ios" selected>iOS Premium</option>
                         <option value="gradient">Gradient</option>
@@ -433,7 +457,7 @@
                 </div>
 
                 <div class="control">
-                    <label>Background color</label>
+                    <label data-i18n="labelBgColor">Background color</label>
                     <select id="bgColor">
                         <option value="black" selected>Black</option>
                         <option value="blue">Blue</option>
@@ -445,7 +469,7 @@
 
 
                 <div class="control">
-                    <label>Highlight weekends</label>
+                    <label data-i18n="labelWeekends">Highlight weekends</label>
                     <select id="weekends">
                         <option value="off">Off</option>
                         <option value="gray">Gray</option>
@@ -456,7 +480,7 @@
                 </div>
 
                 <div class="control">
-                    <label>Show iOS safe zones</label>
+                    <label data-i18n="labelSafe">Show iOS safe zones</label>
                     <select id="safeZones">
                         <option value="on" selected>On</option>
                         <option value="off">Off</option>
@@ -478,60 +502,79 @@
 
     <div id="instructions" class="tab-content">
 
-        <div class="info">
-
-            <h2> Установка обоев через приложение «Команды» </h2>
+        <!-- RU -->
+        <div class="info instructions-lang" data-lang="ru">
+            <h2>Установка обоев через приложение «Команды»</h2>
             Обои обновляются автоматически каждый день с помощью стандартного приложения <strong>«Команды»</strong> на iPhone.
             Также можно настроить несколько тем на разное время.
 
-            <h3> 1️⃣ Откройте приложение <strong>«Команды»</strong> на iPhone.</h3>
-            <img src="images/1-главная-команды.PNG" alt="Главный экран приложения Команды">
+            <h3>1️⃣ Откройте приложение <strong>«Команды»</strong> на iPhone.</h3>
+            <img src="images/1-главная-команды.PNG">
 
-            <h3> 2️⃣ Внизу экрана нажмите вкладку <strong>«Автоматизация»</strong> и нажмите <strong>"Новая атоматизация"<strong>.</h3>
-            Внизу экрана нажмите вкладку <strong>«Автоматизация»</strong> и нажмите <strong>"Новая атоматизация"<strong>.
-            <img src="images/2-автоматизация.PNG" alt="Вкладка Автоматизация">
+            <h3>2️⃣ Перейдите во вкладку <strong>«Автоматизация»</strong> и нажмите <strong>«Новая автоматизация»</strong>.</h3>
+            <img src="images/2-автоматизация.PNG">
 
-            <h3> 3️⃣ Выберите пункт <strong>«Время суток»</strong></h3>
-                Выберите пункт <strong>«Время суток»</strong>
-            <img src="images/3-время-суток.PNG" alt="Выбор времени">
-                Укажите нужное время (например, 00:00)
-            <img src="images/4-выбор-времени.PNG" alt="Создать новую команду">
-                Включите <strong>«Немедленный запуск»</strong> и нажмите <strong>«Далее»</strong>.
-            <img src="images/5-немедленный-запуск.PNG" alt="Создать новую команду">
+            <h3>3️⃣ Выберите <strong>«Время суток»</strong>.</h3>
+            <img src="images/3-время-суток.PNG">
 
-            <h3> 4️⃣ Выберите <strong>«Создать новую быструю команду»</strong>.</h3>
-            Выберите <strong>«Создать новую быструю команду»</strong>.
-            <img src="images/6-создать-новую-бк.PNG" alt="Получить содержимое URL">
+            <h3>4️⃣ Укажите время и включите <strong>«Немедленный запуск»</strong>, нажмите <strong>«Далее»</strong>.</h3>
+            <img src="images/4-выбор-времени.PNG">
 
-            <h3> 5️⃣ В поиске действий найдите и выберите <strong>«Получить содержимое URL»</strong>.</h3>
-                В поиске действий найдите и выберите <strong>«Получить содержимое URL»</strong>.
-            <img src="images/7-получить-содержимое-url.PNG" alt="Получить содержимое URL">
+            <h3>5️⃣ Выберите <strong>«Создать новую быструю команду»</strong>.</h3>
+            <img src="images/6-создать-новую-бк.PNG">
 
-            <h3> 6️⃣ Скопируйте ссылку на обои с сайта и вставьте её в поле <strong>«URL-адрес»</strong>.</h3>
-            <img src="images/8-вставляем-ссылку.PNG" alt="Вставка URL">
+            <h3>6️⃣ Добавьте действие <strong>«Получить содержимое URL»</strong>.</h3>
+            <img src="images/7-получить-содержимое-url.PNG">
 
-            <h3> 7️⃣ В поиске действий найдите и выберите <strong>«Установить как обои»</strong>.</h3>
-            <img src="images/9-установить-фото-как-обои.PNG" alt="Установить как обои">
+            <h3>7️⃣ Вставьте ссылку на обои в поле <strong>URL</strong>.</h3>
+            <img src="images/8-вставляем-ссылку.PNG">
 
-            <h3> 8️⃣ Выберите, куда установить обои:</h3>
-            <ul>
-                <li>Экран блокировки</li>
-                <li>Экран «Домой»</li>
-                <li>или оба</li>
-            </ul>
-            Уберите все дополнительные галочки ниже и нажмите <strong>Готово (✔)</strong>.
-            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG" alt="Выбор экрана">
+            <h3>8️⃣ Добавьте действие <strong>«Установить как обои»</strong>.</h3>
+            <img src="images/9-установить-фото-как-обои.PNG">
 
-            <h3> 🏆 Готово.</h3>
-            <h3> Теперь обои будут автоматически обновляться каждый день в выбранное время. </h3>
-            <p style="margin-top:20px;opacity:.7;">
-                💡Рекомендуется ставить время обновления ночью (например, 00:00),
-                чтобы календарь всегда был актуален.
-            </p>
+            <h3>9️⃣ Выберите экран (блокировки / домой / оба) и нажмите ✔</h3>
+            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG">
 
+            <h3>🏆 Готово. Обои будут обновляться автоматически.</h3>
+        </div>
+
+        <!-- EN -->
+        <div class="info instructions-lang" data-lang="en">
+            <h2>Set wallpaper using Shortcuts app</h2>
+            The wallpaper updates automatically every day using the standard <strong>Shortcuts</strong> app on iPhone.
+
+            <h3>1️⃣ Open the <strong>Shortcuts</strong> app.</h3>
+            <img src="images/1-главная-команды.PNG">
+
+            <h3>2️⃣ Go to the <strong>Automation</strong> tab and tap <strong>Create Automation</strong>.</h3>
+            <img src="images/2-автоматизация.PNG">
+
+            <h3>3️⃣ Select <strong>Time of Day</strong>.</h3>
+            <img src="images/3-время-суток.PNG">
+
+            <h3>4️⃣ Set the time and enable <strong>Run Immediately</strong>, tap <strong>Next</strong>.</h3>
+            <img src="images/4-выбор-времени.PNG">
+
+            <h3>5️⃣ Tap <strong>Create New Shortcut</strong>.</h3>
+            <img src="images/6-создать-новую-бк.PNG">
+
+            <h3>6️⃣ Add action <strong>Get Contents of URL</strong>.</h3>
+            <img src="images/7-получить-содержимое-url.PNG">
+
+            <h3>7️⃣ Paste your wallpaper link into the <strong>URL</strong> field.</h3>
+            <img src="images/8-вставляем-ссылку.PNG">
+
+            <h3>8️⃣ Add action <strong>Set Wallpaper</strong>.</h3>
+            <img src="images/9-установить-фото-как-обои.PNG">
+
+            <h3>9️⃣ Choose Lock Screen / Home Screen / Both and tap ✔</h3>
+            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG">
+
+            <h3>🏆 Done. Your wallpaper will update automatically.</h3>
         </div>
 
     </div>
+
 
 
 
@@ -613,6 +656,72 @@
             document.getElementById(tab.dataset.tab).classList.add("active");
         };
     });
+
+    const translations = {
+        ru: {
+            title: "Calendar Wallpaper",
+            subtitle: "Минималистичные обои-календарь для экрана блокировки iPhone",
+
+            tabGenerator: "Генератор",
+            tabInstructions: "Инструкция",
+
+            labelDevice: "Модель iPhone",
+            labelLang: "Язык",
+            labelTZ: "Часовой пояс",
+            labelSize: "Размер",
+            labelDayStyle: "Стиль дней",
+            labelBg: "Фон",
+            labelBgColor: "Цвет фона",
+            labelWeekends: "Подсветка выходных",
+            labelSafe: "Показать безопасные зоны",
+
+        },
+        en: {
+            title: "Calendar Wallpaper",
+            subtitle: "Minimal calendar wallpaper for iPhone lock screen",
+
+            tabGenerator: "Generator",
+            tabInstructions: "Instructions",
+
+            labelDevice: "iPhone model",
+            labelLang: "Language",
+            labelTZ: "Time zone",
+            labelSize: "Size",
+            labelDayStyle: "Day style",
+            labelBg: "Background",
+            labelBgColor: "Background color",
+            labelWeekends: "Highlight weekends",
+            labelSafe: "Show iOS safe zones",
+        }
+    };
+
+    const uiTranslations = translations;
+
+    function setUILanguage(lang) {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.dataset.i18n;
+            if (translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+
+        document.querySelectorAll(".instructions-lang").forEach(block => {
+            block.classList.toggle("active", block.dataset.lang === lang);
+        });
+
+        localStorage.setItem("uiLang", lang);
+    }
+
+
+    const uiLangSelect = document.getElementById("uiLang");
+    const savedUILang = localStorage.getItem("uiLang") || "ru";
+    uiLangSelect.value = savedUILang;
+    setUILanguage(savedUILang);
+
+    uiLangSelect.onchange = () => {
+        setUILanguage(uiLangSelect.value);
+    };
+
 
 </script>
 
