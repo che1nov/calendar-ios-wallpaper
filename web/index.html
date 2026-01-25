@@ -458,7 +458,17 @@
 
                 <div class="control">
                     <label data-i18n="labelBgColor">Background color</label>
-                    <input type="color" id="bgColor" value="#000000">
+
+                    <select id="bgColorPreset">
+                        <option value="black">Black</option>
+                        <option value="blue">Blue</option>
+                        <option value="purple">Purple</option>
+                        <option value="green">Green</option>
+                        <option value="red">Red</option>
+                        <option value="custom">Custom</option>
+                    </select>
+
+                    <input type="color" id="bgColorCustom" value="#000000" style="margin-top:8px;display:none;">
                 </div>
 
                 <div class="control">
@@ -587,9 +597,18 @@
     const size = document.getElementById("size");
     const sizeValue = document.getElementById("sizeValue");
     const bg = document.getElementById("bg");
-    const bgColor = document.getElementById("bgColor");
+    const bgColorPreset = document.getElementById("bgColorPreset");
+    const bgColorCustom = document.getElementById("bgColorCustom");
+
 
     function buildURL() {
+        let color;
+        if (bgColorPreset.value === "custom") {
+            color = bgColorCustom.value;
+        } else {
+            color = bgColorPreset.value;
+        }
+
         return `/wallpaper?mode=months`
             + `&device=${device.value}`
             + `&lang=${lang.value}`
@@ -598,7 +617,8 @@
             + `&style=${dayStyle.value}`
             + `&size=${size.value}`
             + `&bg=${bg.value}`
-            + `&color=${encodeURIComponent(bgColor.value)}`;
+            + `&color=${encodeURIComponent(color)}`;
+
     }
 
     function update(){
@@ -607,13 +627,19 @@
         urlBox.textContent = location.origin + url;
     }
 
+    bgColorPreset.onchange = () => {
+        bgColorCustom.style.display =
+            bgColorPreset.value === "custom" ? "block" : "none";
+        update();
+    };
+
     device.onchange=update;
     lang.onchange=update;
     tz.oninput=update;
     weekends.onchange=update;
     dayStyle.onchange = update;
     bg.onchange = update;
-    bgColor.oninput = update;
+    bgColorCustom.oninput = update;
 
 
 
