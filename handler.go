@@ -10,6 +10,13 @@ import (
 func RegisterHandlers() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/wallpaper", wallpaperHandler)
+
+	http.Handle("/images/",
+		http.StripPrefix("/images/",
+			http.FileServer(http.Dir("web/images")),
+		),
+	)
+
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {

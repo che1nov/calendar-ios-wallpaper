@@ -193,6 +193,70 @@
             font-size:13px;
             color:var(--muted);
         }
+
+        .tabs {
+            display:flex;
+            gap:8px;
+            margin-bottom:24px;
+        }
+
+        .tab {
+            padding:10px 16px;
+            border-radius:12px;
+            border:1px solid var(--border);
+            background:#1c1c1e;
+            color:var(--text);
+            cursor:pointer;
+            font-size:14px;
+        }
+
+        .tab.active {
+            background:var(--accent);
+            color:#000;
+        }
+
+        .tab-content {
+            display:none;
+        }
+
+        .tab-content.active {
+            display:block;
+        }
+
+        .info {
+            background:var(--card);
+            border:1px solid var(--border);
+            border-radius:20px;
+            padding:24px;
+            max-width:800px;
+        }
+
+        .screens {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin: 12px 0 24px;
+        }
+
+        .screens img {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .info img {
+            max-width: 320px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px auto 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.6);
+        }
+
+
+
     </style>
 </head>
 
@@ -202,6 +266,12 @@
     <h1>Calendar Wallpaper</h1>
     <div class="subtitle">Minimal iOS lock screen calendar wallpaper</div>
 
+    <div class="tabs">
+        <button class="tab active" data-tab="generator">Generator</button>
+        <button class="tab" data-tab="instructions">Instructions</button>
+    </div>
+
+    <div id="generator" class="tab-content active">
     <div class="layout">
 
         <!-- PHONE -->
@@ -404,6 +474,88 @@
         </div>
 
     </div>
+    </div>
+
+    <div id="instructions" class="tab-content">
+
+        <div class="info">
+
+            <h2> Установка обоев через приложение «Команды»</h2>
+
+            <p>
+                Обои будут обновляться автоматически каждый день с помощью стандартного приложения
+                <strong>«Команды»</strong> на iPhone.
+            </p>
+
+            <h3>Шаг 1</h3>
+            Откройте приложение <strong>«Команды»</strong> на iPhone.
+            <img src="images/Главная%20команды.PNG" alt="Главный экран приложения Команды">
+
+            <h3>Шаг 2</h3>
+            Внизу экрана нажмите вкладку <strong>«Автоматизация»</strong> и нажмите <strong>"Новая атоматизация"<strong>.
+            <img src="images/2-автоматизация.PNG" alt="Вкладка Автоматизация">
+
+            <h3>Шаг 3</h3>
+                Выберите пункт <strong>«Время суток»</strong><br>
+            <img src="images/Время%20суток.PNG" alt="Выбор времени">
+                Укажите нужное время (например, 00:00)
+            <img src="images/Выбор%20времени.PNG" alt="Создать новую команду">
+                Включите <strong>«Немедленный запуск»</strong> и нажмите <strong>«Далее»</strong>.
+            <img src="images/Немедленный%20запуск.PNG" alt="Создать новую команду">
+
+            <h3>Шаг 4</h3>
+            Выберите <strong>«Создать новую быструю команду»</strong>.
+            <img src="images/Создать%20новую%20бк.PNG" alt="Получить содержимое URL">
+
+            <h3>Шаг 5</h3>
+            <p>
+                В поиске действий найдите и выберите
+                <strong>«Получить содержимое URL»</strong>.
+            </p>
+            <img src="images/Получить%20содержимое%20URL.PNG" alt="Получить содержимое URL">
+
+            <h3>Шаг 7</h3>
+            <p>
+                Скопируйте ссылку на обои с сайта и вставьте её в поле
+                <strong>«URL-адрес»</strong>.
+            </p>
+            <img src="images/8-ставляем-ссылку.PNG" alt="Вставка URL">
+
+            <h3>Шаг 8. Установка как обои</h3>
+                В поиске действий найдите и выберите
+                <strong>«Установить как обои»</strong>.
+            <img src="images/9-установить-фото-как-обои.PNG" alt="Установить как обои">
+
+            <h3>Шаг 9. Выбор экрана</h3>
+            <p>
+                Выберите, куда установить обои:
+            <ul>
+                <li>Экран блокировки</li>
+                <li>Экран «Домой»</li>
+                <li>или оба</li>
+            </ul>
+            Уберите все дополнительные галочки ниже и нажмите <strong>Готово (✔)</strong>.
+            </p>
+            <img src="images/9-установить-фото-как-обои.PNG" alt="Выбор экрана">
+
+            <h3>Шаг 10. Готово 🎉</h3>
+            <p>
+                Теперь обои будут автоматически обновляться каждый день в выбранное время.
+            </p>
+            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG" alt="Готово">
+
+            <p style="margin-top:20px;opacity:.7;">
+                💡 Рекомендуется ставить время обновления ночью (например, 00:00),
+                чтобы календарь всегда был актуален.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+
 </div>
 
 <script>
@@ -468,6 +620,20 @@
     sizeValue.textContent = size.value + "%";
 
     update();
+
+    const tabs = document.querySelectorAll(".tab");
+    const contents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(tab=>{
+        tab.onclick=()=>{
+            tabs.forEach(t=>t.classList.remove("active"));
+            contents.forEach(c=>c.classList.remove("active"));
+
+            tab.classList.add("active");
+            document.getElementById(tab.dataset.tab).classList.add("active");
+        };
+    });
+
 </script>
 
 </body>
