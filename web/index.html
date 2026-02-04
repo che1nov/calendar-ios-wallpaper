@@ -292,8 +292,8 @@
     <div class="subtitle" data-i18n="subtitle"></div>
 
     <div class="tabs">
-        <button class="tab active" data-tab="generator">Generator</button>
-        <button class="tab" data-tab="instructions">Instructions</button>
+        <button class="tab active" data-tab="generator" data-i18n="tabGenerator">Generator</button>
+        <button class="tab" data-tab="instructions" data-i18n="tabInstructions">Instructions</button>
     </div>
 
     <div id="generator" class="tab-content active">
@@ -308,7 +308,7 @@
                 <div class="ios-safe top-safe"><span>Clock / Date</span></div>
 
                 <div class="preview-viewport">
-                    <img id="preview">
+                    <img id="preview" alt="Wallpaper preview">
                 </div>
 
             </div>
@@ -510,31 +510,31 @@
             Также можно настроить несколько тем на разное время.
 
             <h3>1️⃣ Откройте приложение <strong>«Команды»</strong> на iPhone.</h3>
-            <img src="images/1-главная-команды.PNG">
+            <img src="images/1-главная-команды.PNG" alt="Step 1">
 
             <h3>2️⃣ Перейдите во вкладку <strong>«Автоматизация»</strong> и нажмите <strong>«Новая автоматизация»</strong>.</h3>
-            <img src="images/2-автоматизация.PNG">
+            <img src="images/2-автоматизация.PNG" alt="Step 2">
 
             <h3>3️⃣ Выберите <strong>«Время суток»</strong>.</h3>
-            <img src="images/3-время-суток.PNG">
+            <img src="images/3-время-суток.PNG" alt="Step 3">
 
             <h3>4️⃣ Укажите время и включите <strong>«Немедленный запуск»</strong>, нажмите <strong>«Далее»</strong>.</h3>
-            <img src="images/4-выбор-времени.PNG">
+            <img src="images/4-выбор-времени.PNG" alt="Step 4">
 
             <h3>5️⃣ Выберите <strong>«Создать новую быструю команду»</strong>.</h3>
-            <img src="images/6-создать-новую-бк.PNG">
+            <img src="images/6-создать-новую-бк.PNG" alt="Step 5">
 
             <h3>6️⃣ Добавьте действие <strong>«Получить содержимое URL»</strong>.</h3>
-            <img src="images/7-получить-содержимое-url.PNG">
+            <img src="images/7-получить-содержимое-url.PNG" alt="Step 6">
 
             <h3>7️⃣ Вставьте ссылку на обои в поле <strong>URL</strong>.</h3>
-            <img src="images/8-вставляем-ссылку.PNG">
+            <img src="images/8-вставляем-ссылку.PNG" alt="Step 7">
 
             <h3>8️⃣ Добавьте действие <strong>«Установить как обои»</strong>.</h3>
-            <img src="images/9-установить-фото-как-обои.PNG">
+            <img src="images/9-установить-фото-как-обои.PNG" alt="Step 8">
 
             <h3>9️⃣ Выберите экран (блокировки / домой / оба) и нажмите ✔</h3>
-            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG">
+            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG" alt="Step 9">
 
             <h3>🏆 Готово. Обои будут обновляться автоматически.</h3>
         </div>
@@ -545,31 +545,31 @@
             The wallpaper updates automatically every day using the standard <strong>Shortcuts</strong> app on iPhone.
 
             <h3>1️⃣ Open the <strong>Shortcuts</strong> app.</h3>
-            <img src="images/1-главная-команды.PNG">
+            <img src="images/1-главная-команды.PNG" alt="Step 1">
 
             <h3>2️⃣ Go to the <strong>Automation</strong> tab and tap <strong>Create Automation</strong>.</h3>
-            <img src="images/2-автоматизация.PNG">
+            <img src="images/2-автоматизация.PNG" alt="Step 2">
 
             <h3>3️⃣ Select <strong>Time of Day</strong>.</h3>
-            <img src="images/3-время-суток.PNG">
+            <img src="images/3-время-суток.PNG" alt="Step 3">
 
             <h3>4️⃣ Set the time and enable <strong>Run Immediately</strong>, tap <strong>Next</strong>.</h3>
-            <img src="images/4-выбор-времени.PNG">
+            <img src="images/4-выбор-времени.PNG" alt="Step 4">
 
             <h3>5️⃣ Tap <strong>Create New Shortcut</strong>.</h3>
-            <img src="images/6-создать-новую-бк.PNG">
+            <img src="images/6-создать-новую-бк.PNG" alt="Step 5">
 
             <h3>6️⃣ Add action <strong>Get Contents of URL</strong>.</h3>
-            <img src="images/7-получить-содержимое-url.PNG">
+            <img src="images/7-получить-содержимое-url.PNG" alt="Step 6">
 
             <h3>7️⃣ Paste your wallpaper link into the <strong>URL</strong> field.</h3>
-            <img src="images/8-вставляем-ссылку.PNG">
+            <img src="images/8-вставляем-ссылку.PNG" alt="Step 7">
 
             <h3>8️⃣ Add action <strong>Set Wallpaper</strong>.</h3>
-            <img src="images/9-установить-фото-как-обои.PNG">
+            <img src="images/9-установить-фото-как-обои.PNG" alt="Step 8">
 
             <h3>9️⃣ Choose Lock Screen / Home Screen / Both and tap ✔</h3>
-            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG">
+            <img src="images/10-выбираем-где-установить-и-убираем-галочки.PNG" alt="Step 9">
 
             <h3>🏆 Done. Your wallpaper will update automatically.</h3>
         </div>
@@ -633,7 +633,7 @@
 
     device.onchange=update;
     lang.onchange=update;
-    tz.oninput=update;
+    tz.onchange=update;
     weekends.onchange=update;
     dayStyle.onchange = update;
     bg.onchange = update;
@@ -647,7 +647,20 @@
     };
 
     document.getElementById("copy").onclick=()=>{
-        navigator.clipboard.writeText(urlBox.textContent);
+        const text = urlBox.textContent;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+            return;
+        }
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        temp.setAttribute("readonly", "");
+        temp.style.position = "absolute";
+        temp.style.left = "-9999px";
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
     };
 
     size.oninput = () => {
