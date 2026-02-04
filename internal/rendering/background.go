@@ -1,4 +1,4 @@
-package main
+package rendering
 
 import (
 	"image"
@@ -9,56 +9,42 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"calendar-wallpaper/internal/domain"
 )
 
-type BackgroundStyle string
-
-const (
-	BgPlain    BackgroundStyle = "plain"
-	BgGradient BackgroundStyle = "gradient"
-	BgNoise    BackgroundStyle = "noise"
-	BgIOS      BackgroundStyle = "ios"
-)
-
-func drawBackground(img *image.RGBA, device DeviceProfile, style BackgroundStyle, bgColor string) {
+func drawBackground(img *image.RGBA, device domain.DeviceProfile, style domain.BackgroundStyle, bgColor string) {
 	base := backgroundBaseColor(bgColor)
 
 	switch style {
-	case BgPlain:
+	case domain.BgPlain:
 		fillSolid(img, base)
-	case BgGradient:
+	case domain.BgGradient:
 		drawGradientWithBase(img, base)
-	case BgNoise:
+	case domain.BgNoise:
 		drawNoiseWithBase(img, base)
-	case BgIOS:
+	case domain.BgIOS:
 		drawPremiumBackgroundWithBase(img, device, base)
 	default:
 		drawPremiumBackgroundWithBase(img, device, base)
 	}
 }
 
-/* =========================
-   COLOR PARSING
-========================= */
-
 func backgroundBaseColor(c string) color.RGBA {
 	if c == "" {
 		return color.RGBA{0, 0, 0, 255}
 	}
 
-	// декодируем %23
 	if decoded, err := url.QueryUnescape(c); err == nil {
 		c = decoded
 	}
 
 	c = strings.ToLower(strings.TrimSpace(c))
 
-	// HEX
 	if strings.HasPrefix(c, "#") {
 		return parseHexColor(c)
 	}
 
-	// Presets
 	switch c {
 	case "blue":
 		return color.RGBA{10, 20, 40, 255}
@@ -88,10 +74,6 @@ func parseHexColor(s string) color.RGBA {
 
 	return color.RGBA{uint8(r), uint8(g), uint8(b), 255}
 }
-
-/* =========================
-   BACKGROUND STYLES
-========================= */
 
 func fillSolid(img *image.RGBA, base color.RGBA) {
 	w := img.Bounds().Dx()
@@ -145,7 +127,7 @@ func drawNoiseWithBase(img *image.RGBA, base color.RGBA) {
 	}
 }
 
-func drawPremiumBackgroundWithBase(img *image.RGBA, device DeviceProfile, base color.RGBA) {
+func drawPremiumBackgroundWithBase(img *image.RGBA, device domain.DeviceProfile, base color.RGBA) {
 	w := img.Bounds().Dx()
 	h := img.Bounds().Dy()
 
@@ -165,10 +147,6 @@ func drawPremiumBackgroundWithBase(img *image.RGBA, device DeviceProfile, base c
 
 	addVignette(img, 0.5)
 }
-
-/* =========================
-   HELPERS
-========================= */
 
 func addVignette(img *image.RGBA, power float64) {
 	w := img.Bounds().Dx()

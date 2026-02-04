@@ -1,9 +1,7 @@
-package main
+package rendering
 
 import (
-	"fmt"
 	"os"
-	"time"
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -34,15 +32,4 @@ func mustFace(f *opentype.Font, size float64) font.Face {
 		panic(err)
 	}
 	return face
-}
-
-func fixedText(format string, a ...any) string {
-	return fmt.Sprintf(format, a...)
-}
-
-func DaysInYear(year int) int {
-	if time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay() == 366 {
-		return 366
-	}
-	return 365
 }

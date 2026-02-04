@@ -1,18 +1,17 @@
-package main
+package rendering
 
 import (
+	"container/list"
 	"fmt"
 	"image"
 	"image/color"
+	"sync"
 	"time"
 
+	"calendar-wallpaper/internal/domain"
 	"golang.org/x/image/font"
 	"golang.org/x/image/math/fixed"
 )
-
-/*
-BASE — дизайн под iPhone 15 / 15 Pro
-*/
 
 const (
 	BaseWidth  = 1179
@@ -26,44 +25,48 @@ const (
 	BaseSpacing   = 32
 )
 
-/*
-DESIGN TUNING
-*/
 const (
-	MonthTitleScale = 1.00 // названия месяцев
-	DayGridScale    = 1.00 // точки / бары / числа
-	FooterScale     = 1.00 // нижний текст
+	MonthTitleScale = 1.00
+	DayGridScale    = 1.00
+	FooterScale     = 1.00
 )
 
-/*
-FONTS
-*/
-var (
-	monthFace  font.Face
-	footerFace font.Face
-	numberFace font.Face
-)
+type FontSet struct {
+	Month  font.Face
+	Footer font.Face
+	Number font.Face
+}
 
-/*
-MAIN ENTRY
-*/
+const maxFontCacheEntries = 64
+
+type fontCacheEntry struct {
+	key   string
+	faces FontSet
+}
+
+var fontCache struct {
+	sync.Mutex
+	items map[string]*list.Element
+	order *list.List
+}
+
 func RenderCalendar(
 	now time.Time,
-	device DeviceProfile,
-	theme Theme,
+	device domain.DeviceProfile,
+	theme domain.Theme,
 	mode string,
 	lang string,
 	weekends string,
-	dayStyle DayStyle,
+	dayStyle domain.DayStyle,
 	uiScale float64,
-	bgStyle BackgroundStyle,
+	bgStyle domain.BackgroundStyle,
 	bgColor string,
 ) *image.RGBA {
 
-	deviceScale := device.Scale()
+	deviceScale := float64(device.Width) / float64(BaseWidth)
 	scale := deviceScale * uiScale
 
-	initFonts(scale)
+	faces := getFontSet(scale)
 
 	img := image.NewRGBA(image.Rect(0, 0, device.Width, device.Height))
 	drawBackground(img, device, bgStyle, bgColor)
@@ -72,7 +75,7 @@ func RenderCalendar(
 		return img
 	}
 
-	months := BuildMonths(now, lang)
+	months := domain.BuildMonths(now, lang)
 
 	safeTop := device.ClockBottom()
 	safeBottom := device.ButtonsTop()
@@ -94,39 +97,64 @@ func RenderCalendar(
 		weekends,
 		dayStyle,
 		scale,
+		faces,
 	)
 
 	footerY := device.ButtonsTop() + int(80*scale)
-	drawFooterAtY(img, now, device, theme, lang, footerY)
+	drawFooterAtY(img, now, device, theme, lang, footerY, faces)
 
 	return img
 }
 
-/*
-FONTS INIT
-*/
-func initFonts(scale float64) {
+func getFontSet(scale float64) FontSet {
+	key := fmt.Sprintf("%.4f", scale)
+
+	fontCache.Lock()
+	defer fontCache.Unlock()
+
+	if fontCache.items == nil {
+		fontCache.items = make(map[string]*list.Element)
+		fontCache.order = list.New()
+	}
+
+	if el, ok := fontCache.items[key]; ok {
+		fontCache.order.MoveToFront(el)
+		return el.Value.(fontCacheEntry).faces
+	}
+
 	fontBytes := mustRead("fonts/SFPRODISPLAYBOLD.OTF")
 	f := mustParseFont(fontBytes)
 
-	monthFace = mustFace(f, BaseMonthFont*scale*MonthTitleScale)
-	footerFace = mustFace(f, BaseFooterFont*scale*FooterScale)
-	numberFace = mustFace(f, BaseNumberFont*scale*DayGridScale)
+	faces := FontSet{
+		Month:  mustFace(f, BaseMonthFont*scale*MonthTitleScale),
+		Footer: mustFace(f, BaseFooterFont*scale*FooterScale),
+		Number: mustFace(f, BaseNumberFont*scale*DayGridScale),
+	}
+	el := fontCache.order.PushFront(fontCacheEntry{key: key, faces: faces})
+	fontCache.items[key] = el
+
+	if fontCache.order.Len() > maxFontCacheEntries {
+		oldest := fontCache.order.Back()
+		if oldest != nil {
+			fontCache.order.Remove(oldest)
+			oldKey := oldest.Value.(fontCacheEntry).key
+			delete(fontCache.items, oldKey)
+		}
+	}
+	return faces
 }
 
-/*
-MONTH GRID
-*/
 func drawMonths(
 	img *image.RGBA,
-	months []MonthData,
-	device DeviceProfile,
+	months []domain.MonthData,
+	device domain.DeviceProfile,
 	usableHeight int,
 	offsetY int,
-	theme Theme,
+	theme domain.Theme,
 	weekends string,
-	dayStyle DayStyle,
+	dayStyle domain.DayStyle,
 	scale float64,
+	faces FontSet,
 ) {
 	const cols = 3
 	const rows = 4
@@ -151,22 +179,21 @@ func drawMonths(
 			dayStyle,
 			cellW,
 			scale,
+			faces,
 		)
 	}
 }
 
-/*
-SINGLE MONTH
-*/
 func drawMonth(
 	img *image.RGBA,
 	cx, cy int,
-	m MonthData,
-	theme Theme,
+	m domain.MonthData,
+	theme domain.Theme,
 	weekends string,
-	style DayStyle,
+	style domain.DayStyle,
 	cellW int,
 	scale float64,
+	faces FontSet,
 ) {
 	titleOffset := int(52 * scale)
 
@@ -175,26 +202,23 @@ func drawMonth(
 		titleColor = theme.Today
 	}
 
-	drawText(img, m.Name, cx, cy-titleOffset, titleColor, monthFace)
+	drawText(img, m.Name, cx, cy-titleOffset, titleColor, faces.Month)
 
 	switch style {
-	case DayDots:
+	case domain.DayDots:
 		drawMonthDots(img, cx, cy, m, theme, weekends, scale)
-	case DayBars:
+	case domain.DayBars:
 		drawMonthBars(img, cx, cy, m, theme, weekends, scale)
-	case DayNumbers:
-		drawMonthNumbers(img, cx, cy, m, theme, weekends, scale)
+	case domain.DayNumbers:
+		drawMonthNumbers(img, cx, cy, m, theme, weekends, scale, faces)
 	}
 }
 
-/*
-DAY STYLES
-*/
 func drawMonthDots(
 	img *image.RGBA,
 	cx, cy int,
-	m MonthData,
-	theme Theme,
+	m domain.MonthData,
+	theme domain.Theme,
 	weekends string,
 	scale float64,
 ) {
@@ -221,8 +245,8 @@ func drawMonthDots(
 func drawMonthBars(
 	img *image.RGBA,
 	cx, cy int,
-	m MonthData,
-	theme Theme,
+	m domain.MonthData,
+	theme domain.Theme,
 	weekends string,
 	scale float64,
 ) {
@@ -252,10 +276,11 @@ func drawMonthBars(
 func drawMonthNumbers(
 	img *image.RGBA,
 	cx, cy int,
-	m MonthData,
-	theme Theme,
+	m domain.MonthData,
+	theme domain.Theme,
 	weekends string,
 	scale float64,
+	faces FontSet,
 ) {
 	gridScale := scale * DayGridScale
 
@@ -278,24 +303,22 @@ func drawMonthNumbers(
 			x,
 			y,
 			resolveDayColor(day, col, m, theme, weekends),
-			numberFace,
+			faces.Number,
 		)
 	}
 }
 
-/*
-FOOTER
-*/
 func drawFooterAtY(
 	img *image.RGBA,
 	now time.Time,
-	device DeviceProfile,
-	theme Theme,
+	device domain.DeviceProfile,
+	theme domain.Theme,
 	lang string,
 	y int,
+	faces FontSet,
 ) {
 	day := now.YearDay()
-	total := DaysInYear(now.Year())
+	total := domain.DaysInYear(now.Year())
 	left := total - day
 	percent := int(float64(day) / float64(total) * 100)
 
@@ -305,7 +328,7 @@ func drawFooterAtY(
 		device.Width/2,
 		y,
 		theme.Text,
-		footerFace,
+		faces.Footer,
 	)
 }
 
@@ -316,9 +339,6 @@ func footerText(left, percent int, lang string) string {
 	return fmt.Sprintf("%d d left   %d%%", left, percent)
 }
 
-/*
-DRAW HELPERS
-*/
 func drawText(img *image.RGBA, text string, cx, y int, col color.Color, face font.Face) {
 	d := &font.Drawer{
 		Dst:  img,
@@ -348,7 +368,7 @@ func drawRect(img *image.RGBA, x, y, w, h int, col color.Color) {
 	}
 }
 
-func resolveDayColor(day, col int, m MonthData, theme Theme, weekends string) color.Color {
+func resolveDayColor(day, col int, m domain.MonthData, theme domain.Theme, weekends string) color.Color {
 	if m.IsCurrent && day == m.PassedDays-1 {
 		return theme.Today
 	}

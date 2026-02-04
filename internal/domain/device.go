@@ -1,23 +1,16 @@
-package main
+package domain
 
-// DeviceProfile описывает параметры экрана iPhone
-// Все зоны считаются ОТ ВЫСОТЫ экрана
 type DeviceProfile struct {
 	Key    string
 	Name   string
 	Width  int
 	Height int
 
-	// Процент высоты экрана (0.0 – 1.0)
-	ClockZoneRatio   float64 // где заканчивается зона часов / даты
-	ButtonsZoneRatio float64 // где начинается зона кнопок
+	ClockZoneRatio   float64
+	ButtonsZoneRatio float64
 
-	BottomInset int // для будущего (home indicator)
+	BottomInset int
 }
-
-// =======================
-// ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-// =======================
 
 func (d DeviceProfile) ClockBottom() int {
 	return int(float64(d.Height) * d.ClockZoneRatio)
@@ -26,14 +19,6 @@ func (d DeviceProfile) ClockBottom() int {
 func (d DeviceProfile) ButtonsTop() int {
 	return int(float64(d.Height) * d.ButtonsZoneRatio)
 }
-
-func (d DeviceProfile) Scale() float64 {
-	return float64(d.Width) / float64(BaseWidth)
-}
-
-// =======================
-// БАЗОВЫЕ ПРОФИЛИ (ШАБЛОНЫ)
-// =======================
 
 var (
 	profileSE23 = DeviceProfile{
@@ -81,13 +66,8 @@ var (
 	}
 )
 
-// =======================
-// ВСЕ МОДЕЛИ (1:1 с UI)
-// =======================
-
 var Devices = map[string]DeviceProfile{
 
-	// ===== Classic (Home Button) =====
 	"iphone-se-1": {
 		Key: "iphone-se-1", Name: "iPhone SE (1st gen)",
 		Width: 640, Height: 1136,
@@ -95,9 +75,8 @@ var Devices = map[string]DeviceProfile{
 	},
 	"iphone-se-2": withKey("iphone-se-2", profileSE23),
 	"iphone-se-3": withKey("iphone-se-3", profileSE23),
-	"iphone-16e":  withKey("iphone-16e", profile15), // future
+	"iphone-16e":  withKey("iphone-16e", profile15),
 
-	// ===== Notch =====
 	"iphone-x": {
 		Key: "iphone-x", Name: "iPhone X / XS / 11 Pro",
 		Width: 1125, Height: 2436,
@@ -117,7 +96,6 @@ var Devices = map[string]DeviceProfile{
 		BottomInset: 34,
 	},
 
-	// ===== Mini =====
 	"iphone-12-mini": {
 		Key: "iphone-12-mini", Name: "iPhone 12 mini",
 		Width: 1080, Height: 2340,
@@ -131,15 +109,13 @@ var Devices = map[string]DeviceProfile{
 		BottomInset: 34,
 	},
 
-	// ===== Standard =====
 	"iphone-12": withKey("iphone-12", profile12),
 	"iphone-13": withKey("iphone-13", profile12),
 	"iphone-14": withKey("iphone-14", profile12),
 	"iphone-15": withKey("iphone-15", profile15),
 	"iphone-16": withKey("iphone-16", profile15),
-	"iphone-17": withKey("iphone-17", profile15), // future
+	"iphone-17": withKey("iphone-17", profile15),
 
-	// ===== Plus =====
 	"iphone-14-plus": {
 		Key: "iphone-14-plus", Name: "iPhone 14 Plus",
 		Width: 1284, Height: 2778,
@@ -159,7 +135,6 @@ var Devices = map[string]DeviceProfile{
 		BottomInset: 34,
 	},
 
-	// ===== Pro =====
 	"iphone-12-pro": withKey("iphone-12-pro", profile12),
 	"iphone-13-pro": withKey("iphone-13-pro", profile12),
 	"iphone-14-pro": withKey("iphone-14-pro", profilePro),
@@ -170,9 +145,8 @@ var Devices = map[string]DeviceProfile{
 		ClockZoneRatio: 0.32, ButtonsZoneRatio: 0.80,
 		BottomInset: 34,
 	},
-	"iphone-17-pro": withKey("iphone-17-pro", profilePro), // future
+	"iphone-17-pro": withKey("iphone-17-pro", profilePro),
 
-	// ===== Pro Max =====
 	"iphone-12-pro-max": withKey("iphone-12-pro-max", profileProMax),
 	"iphone-13-pro-max": withKey("iphone-13-pro-max", profileProMax),
 	"iphone-14-pro-max": withKey("iphone-14-pro-max", profileProMax),
@@ -183,15 +157,10 @@ var Devices = map[string]DeviceProfile{
 		ClockZoneRatio: 0.32, ButtonsZoneRatio: 0.80,
 		BottomInset: 34,
 	},
-	"iphone-17-pro-max": withKey("iphone-17-pro-max", profileProMax), // future
+	"iphone-17-pro-max": withKey("iphone-17-pro-max", profileProMax),
 
-	// ===== Air =====
-	"iphone-air": withKey("iphone-air", profile15), // концепт
+	"iphone-air": withKey("iphone-air", profile15),
 }
-
-// =======================
-// УТИЛИТА ДЛЯ АЛИАСОВ
-// =======================
 
 func withKey(key string, base DeviceProfile) DeviceProfile {
 	base.Key = key

@@ -1,4 +1,4 @@
-package main
+package domain
 
 import "time"
 
@@ -7,12 +7,19 @@ type MonthData struct {
 	Days         int
 	PassedDays   int
 	IsCurrent    bool
-	StartWeekday int // Monday = 0
+	StartWeekday int
 }
 
 var monthNames = map[string][]string{
 	"en": {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"},
 	"ru": {"Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"},
+}
+
+func NormalizeLang(lang string) string {
+	if _, ok := monthNames[lang]; ok {
+		return lang
+	}
+	return "en"
 }
 
 func Progress(t time.Time) (day, left, percent int) {
@@ -34,14 +41,14 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 	year := now.Year()
 	loc := now.Location()
 
-	names := monthNames[lang]
+	names := monthNames[NormalizeLang(lang)]
 	months := make([]MonthData, 12)
 
 	for m := 1; m <= 12; m++ {
 		first := time.Date(year, time.Month(m), 1, 0, 0, 0, 0, loc)
 		days := first.AddDate(0, 1, -1).Day()
 
-		weekday := (int(first.Weekday()) + 6) % 7 // Monday=0
+		weekday := (int(first.Weekday()) + 6) % 7
 
 		passed := 0
 		if int(now.Month()) > m {
@@ -59,4 +66,11 @@ func BuildMonths(now time.Time, lang string) []MonthData {
 		}
 	}
 	return months
+}
+
+func DaysInYear(year int) int {
+	if time.Date(year, time.December, 31, 0, 0, 0, 0, time.UTC).YearDay() == 366 {
+		return 366
+	}
+	return 365
 }
